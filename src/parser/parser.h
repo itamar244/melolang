@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <string>
-#include "../ast.h"
+#include <melo/ast.h>
 #include "state.h"
 #include "tokenizer.h"
 

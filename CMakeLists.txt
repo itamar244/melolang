@@ -1,7 +1,15 @@
 cmake_minimum_required(VERSION 3.5)
 
-file(GLOB_RECURSE MeloLang_SRC INTERFACE src/*.cc)
+if(NOT TARGET MeloLang)
+	include_directories(include)
 
-add_library(MeloLang SHARED ${MeloLang_SRC})
+	file(GLOB_RECURSE MeloLang_SRC PRIVATE src/*.cc)
 
-target_include_directories(MeloLang INTERFACE include)
+	add_subdirectory(lib/atic)
+
+	add_library(MeloLang SHARED ${MeloLang_SRC})
+
+	target_include_directories(MeloLang INTERFACE include)
+
+	target_link_libraries(MeloLang PRIVATE Atic)
+endif()
