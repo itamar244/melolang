@@ -3,8 +3,8 @@
 #include <string>
 #include <exception>
 #include <memory>
-#include "./state.h"
-#include "./token_types.h"
+#include "parser/state.h"
+#include "parser/token_types.h"
 
 namespace melo::parser {
 

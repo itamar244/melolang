@@ -1,8 +1,8 @@
-#include "./token_types.h"
+#include "parser/token_types.h"
 
 namespace melo::parser {
 
-const std::string TokenTypeToString(TokenType type) {
+std::string TokenTypeToString(TokenType type) {
 	switch (type) {
 #define V(KEYWORD) case tt::_##KEYWORD: return #KEYWORD;
 		MELO_KEYWORD_TYPES(V)

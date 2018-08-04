@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../ast.h"
-#include "../phrase.h"
-#include "section_walker.h"
+#include "melo/ast.h"
+#include "melo/phrase.h"
+#include "melo/evaluator/section_walker.h"
 
 namespace melo::evaluator {
 

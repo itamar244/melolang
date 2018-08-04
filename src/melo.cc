@@ -1,5 +1,5 @@
 #include <istream>
-#include <melo/melo.h>
+#include "melo/melo.h"
 #include "parser/parser.h"
 #include "parser/state.h"
 

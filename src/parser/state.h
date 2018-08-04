@@ -5,7 +5,7 @@
 #include <istream>
 #include <memory>
 #include <string>
-#include "./token_types.h"
+#include "parser/token_types.h"
 
 namespace melo::parser {
 

@@ -2,9 +2,9 @@
 
 #include <map>
 #include <string>
-#include <melo/ast.h>
-#include <melo/phrase.h>
-#include <melo/evaluator/values.h>
+#include "melo/ast.h"
+#include "melo/phrase.h"
+#include "melo/evaluator/values.h"
 
 namespace melo::evaluator {
 

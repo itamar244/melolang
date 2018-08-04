@@ -47,6 +47,6 @@ const std::map<std::string, TokenType> keywords({
 #undef V
 });
 
-const std::string TokenTypeToString(TokenType);
+std::string TokenTypeToString(TokenType);
 
 } // namespace melo::parser

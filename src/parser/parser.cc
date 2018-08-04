@@ -1,7 +1,7 @@
-#include "parser.h"
+#include "parser/parser.h"
 #include <exception>
 #include <utility>
-#include <melo/ast.h>
+#include "melo/ast.h"
 
 namespace melo::parser {
 

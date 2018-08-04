@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include <melo/ast.h>
-#include <melo/phrase.h>
+#include "melo/ast.h"
+#include "melo/phrase.h"
 
 namespace melo::evaluator {
 

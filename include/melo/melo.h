@@ -1,8 +1,8 @@
 #pragma once
 
 #include <istream>
-#include "ast.h"
-#include "evaluator/module.h"
+#include "melo/ast.h"
+#include "melo/evaluator/module.h"
 
 namespace melo {
 

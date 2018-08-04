@@ -1,7 +1,7 @@
-#include "./tokenizer.h"
+#include "parser/tokenizer.h"
 #include <cctype>
 #include <string>
-#include "./token_types.h"
+#include "parser/token_types.h"
 
 namespace melo::parser {
 

@@ -4,10 +4,10 @@
 #include <map>
 #include <memory>
 #include <string>
-#include "../ast.h"
-#include "../phrase.h"
-#include "section_walker.h"
-#include "values.h"
+#include "melo/ast.h"
+#include "melo/phrase.h"
+#include "melo/evaluator/section_walker.h"
+#include "melo/evaluator/values.h"
 
 namespace melo::evaluator {
 

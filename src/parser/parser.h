@@ -2,9 +2,9 @@
 
 #include <memory>
 #include <string>
-#include <melo/ast.h>
-#include "state.h"
-#include "tokenizer.h"
+#include "melo/ast.h"
+#include "parser/state.h"
+#include "parser/tokenizer.h"
 
 namespace melo::parser {
 
