@@ -1,3 +1,2 @@
-# Melo Language
-
-A custom language used to create melody data representation
+# melolang
+a language to describe melodies data
