@@ -20,6 +20,7 @@ namespace melo::ast {
 	V(Section)                                                                   \
 	V(PhraseLiteral)                                                             \
 	V(Identifier)                                                                \
+	V(FunctionCall)                                                              \
 	V(NoteLiteral)                                                               \
 	V(NumericLiteral)
 
@@ -104,6 +105,16 @@ struct NumericLiteral : public Expression {
 
 	NumericLiteral(const std::string& value)
 			: Expression(kNumericLiteral), value(value) {}
+};
+
+struct FunctionCall : public Expression {
+	const IdentifierPtr id;
+	const std::vector<ExpressionPtr> args;
+
+	FunctionCall(IdentifierPtr id, std::vector<ExpressionPtr> args)
+			: Expression(kFunctionCall)
+			, id(std::move(id))
+			, args(std::move(args)) {}
 };
 
 struct Block : public Statement {

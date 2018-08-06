@@ -37,8 +37,12 @@ ExpressionPtr Parser::ParseExpression() {
 	switch (state_->type) {
 		case tt::bracketL:
 			return ParseSection();
+		case tt::parenL:
+			return ParsePhraseLiteral();
 		case tt::num:
 			return ParseNumber();
+		case tt::name:
+			return ParseMaybeFunctionCall();
 		default:
 			throw std::logic_error(
 					"unsupported token for expression: " +
@@ -72,6 +76,19 @@ PhraseLiteralPtr Parser::ParsePhraseLiteral() {
 	}
 
 	return std::make_unique<PhraseLiteral>(std::move(length), std::move(notes));
+}
+
+
+ast::ExpressionPtr Parser::ParseMaybeFunctionCall() {
+	auto id = ParseIdentifier();
+	if (!t_.Eat(tt::parenL)) {
+		return id;
+	}
+	std::vector<ExpressionPtr> args;
+	// FIXME: when arguments are supported add params parsing
+	t_.Expect(tt::parenR);
+	t_.Next();
+	return std::make_unique<FunctionCall>(std::move(id), std::move(args));
 }
 
 IdentifierPtr Parser::ParseIdentifier() {
