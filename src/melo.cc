@@ -9,8 +9,4 @@ ast::BlockPtr Parse(std::istream& stream) {
 	return parser::Parser(parser::State::Create(stream)).Parse();
 }
 
-evaluator::Module CreateModule(std::istream& stream) {
-	return {Parse(stream)};
-}
-
 } // namespace melo

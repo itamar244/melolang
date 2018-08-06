@@ -10,8 +10,6 @@ namespace melo::evaluator {
 
 using Scope = std::map<std::string, ast::Expression>;
 
-ast::ExpressionPtr& GetMain(ast::BlockPtr& program);
-Phrase PhraseNodeToPhrase(const ast::PhraseLiteralPtr& phrase);
-Value* ExpressionToValue(const ast::ExpressionPtr& expr);
+Phrase PhraseNodeToPhrase(const ast::PhraseLiteral* phrase);
 
 }  // namespace melo::evaluator

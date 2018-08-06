@@ -1,13 +1,14 @@
 #pragma once
 
+#include <memory>
 #include "melo/ast.h"
 #include "melo/phrase.h"
-#include "melo/evaluator/section_walker.h"
 
 namespace melo::evaluator {
 
 #define MELO_EVALUATOR_VALUE_TYPES(V)                                          \
-	V(SectionValue)                                                              \
+	V(FunctionValue)                                                             \
+	V(ListLiteralValue)                                                          \
 	V(NumberValue)
 
 enum ValueType : uint8_t {
@@ -36,17 +37,33 @@ protected:
 	Value(ValueType type) : type(type) {}
 };
 
+
+Value* ExpressionToValue(const ast::ExpressionPtr& expr);
+
+
+struct FunctionValue : public Value {
+	// FIXME: add params when added
+	const ast::BlockPtr& body;
+
+	FunctionValue(const ast::BlockPtr& body)
+			: Value(kFunctionValue), body(body) {}
+};
+
 struct NumberValue : public Value {
 	const float value;
 
 	NumberValue(float value) : Value(kNumberValue), value(value) {}
 };
 
-struct SectionValue : public Value {
-	const ast::Section* section;
+struct ListLiteralValue : public Value {
+	const ast::ListLiteral* list;
 
-	SectionValue(const ast::Section* section)
-			: Value(kSectionValue), section(section) {}
+	ListLiteralValue(const ast::ListLiteral* list)
+			: Value(kListLiteralValue), list(list) {}
+
+	inline const Value* operator[](std::size_t i) const {
+		return ExpressionToValue(list->elements.at(i));
+	}
 };
 
 }  // namespace melo::evaluator

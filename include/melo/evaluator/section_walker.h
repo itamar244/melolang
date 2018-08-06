@@ -1,14 +1,14 @@
 #pragma once
 
 #include <memory>
-#include "melo/ast.h"
 #include "melo/phrase.h"
+#include "melo/evaluator/values.h"
 
 namespace melo::evaluator {
 
 class SectionWalker {
 public:
-	SectionWalker(ast::Section* section) : section_(section) {};
+	SectionWalker(const ListLiteralValue* section) : section_(section) {};
 
 	inline std::size_t pos() const {
 		return pos_;
@@ -22,7 +22,7 @@ public:
 	Phrase GetCurPhrase();
 
 private:
-	const ast::Section* section_;
+	const ListLiteralValue* section_;
 
 	std::unique_ptr<Phrase> phrase_cache_ = nullptr;
 	std::size_t pos_ = 0;

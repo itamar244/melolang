@@ -38,19 +38,7 @@ inline uint8_t StringToNote(const std::string& str) {
 
 } // namespace
 
-ast::ExpressionPtr& GetMain(ast::BlockPtr& program) {
-	for (auto& statement : program->statements) {
-		if (auto export_decl = statement->AsExport()) {
-			if (export_decl->id->name == "main") {
-				return export_decl->value;
-			}
-		}
-	}
-
-	throw std::logic_error("no 'main' function in ast");
-}
-
-Phrase PhraseNodeToPhrase(const ast::PhraseLiteralPtr& phrase) {
+Phrase PhraseNodeToPhrase(const ast::PhraseLiteral* phrase) {
 	return {
 		atic::MapIterable<decltype(phrase->notes), std::list<uint8_t> >(
 			phrase->notes, [](const ast::IdentifierPtr& id) {
@@ -59,17 +47,4 @@ Phrase PhraseNodeToPhrase(const ast::PhraseLiteralPtr& phrase) {
 			LengthToFloat(phrase->length),
 	};
 }
-
-Value* ExpressionToValue(const ast::ExpressionPtr& expr) {
-	switch (expr->type) {
-		case ast::kNumericLiteral:
-			return new NumberValue(
-					std::atof(expr->AsNumericLiteral()->value.c_str()));
-		case ast::kSection:
-			return new SectionValue(expr->AsSection());
-		default:
-			throw std::logic_error("expression type isn't supported as value");
-	}
-}
-
 }  // namespace melo::evaluator

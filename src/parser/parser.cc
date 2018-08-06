@@ -1,5 +1,6 @@
 #include "parser/parser.h"
 #include <exception>
+#include <iostream>
 #include <utility>
 #include "melo/ast.h"
 
@@ -36,7 +37,7 @@ BlockPtr Parser::ParseBlock(bool top_level) {
 ExpressionPtr Parser::ParseExpression() {
 	switch (state_->type) {
 		case tt::bracketL:
-			return ParseSection();
+			return ParseListLiteral();
 		case tt::parenL:
 			return ParsePhraseLiteral();
 		case tt::num:
@@ -50,18 +51,18 @@ ExpressionPtr Parser::ParseExpression() {
 	}
 }
 
-SectionPtr Parser::ParseSection() {
-	std::vector<PhraseLiteralPtr> sections;
+ListLiteralPtr Parser::ParseListLiteral() {
+	std::vector<ExpressionPtr> sections;
 
 	t_.Next();
 	while (!t_.Eat(tt::bracketR)) {
-		sections.push_back(ParsePhraseLiteral());
+		sections.push_back(ParseExpression());
 		if (!t_.Eat(tt::comma) && !t_.Match(tt::bracketR)) {
 			throw std::logic_error("unfinished section");
 		}
 	}
 
-	return std::make_unique<Section>(std::move(sections));
+	return std::make_unique<ListLiteral>(std::move(sections));
 }
 
 PhraseLiteralPtr Parser::ParsePhraseLiteral() {
@@ -84,6 +85,7 @@ ast::ExpressionPtr Parser::ParseMaybeFunctionCall() {
 	if (!t_.Eat(tt::parenL)) {
 		return id;
 	}
+	std::cout << id->name << '\n';
 	std::vector<ExpressionPtr> args;
 	// FIXME: when arguments are supported add params parsing
 	t_.Expect(tt::parenR);
