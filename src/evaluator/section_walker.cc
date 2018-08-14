@@ -1,5 +1,6 @@
 #include "melo/evaluator/section_walker.h"
 #include <memory>
+#include "melo/evaluator/evaluate_nodes.h"
 #include "evaluator/utils.h"
 
 namespace melo::evaluator {
@@ -10,12 +11,10 @@ bool SectionWalker::HasNextPhrase() const {
 	return pos_ < phrases.size();
 }
 
-Phrase SectionWalker::GetCurPhrase() {
+PhraseValue SectionWalker::GetCurPhrase() {
 	if (phrase_cache_ == nullptr) {
-		auto& phrases = section_->list->elements;
-
-		phrase_cache_ = std::make_unique<Phrase>(
-				PhraseNodeToPhrase(phrases.at(pos_)->AsPhraseLiteral()));
+		phrase_cache_ = EvaluateExpr(
+				scope_, section_->list->elements.at(pos_))->AsPhraseValue();
 	}
 
 	return *phrase_cache_;

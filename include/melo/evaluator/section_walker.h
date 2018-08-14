@@ -1,30 +1,37 @@
 #pragma once
 
 #include <memory>
-#include "melo/phrase.h"
+#include <atic/ptr.h>
+#include "melo/evaluator/scope.h"
 #include "melo/evaluator/values.h"
 
 namespace melo::evaluator {
 
 class SectionWalker {
 public:
-	SectionWalker(const ListLiteralValue* section) : section_(section) {};
+	SectionWalker(LinkedScope& scope, const ListLiteralValue* section)
+			: scope_(scope)
+			, section_(section) {}
+
+	~SectionWalker() {
+		atic::MaybeDeletePtr(phrase_cache_);
+	}
 
 	inline std::size_t pos() const {
 		return pos_;
 	}
 	inline void Next() {
-		phrase_cache_ = nullptr;
+		atic::MaybeDeletePtr(phrase_cache_);
 		++pos_;
 	}
 
 	bool HasNextPhrase() const;
-	Phrase GetCurPhrase();
+	PhraseValue GetCurPhrase();
 
 private:
+	LinkedScope& scope_;
 	const ListLiteralValue* section_;
-
-	std::unique_ptr<Phrase> phrase_cache_ = nullptr;
+	const PhraseValue* phrase_cache_ = nullptr;
 	std::size_t pos_ = 0;
 };
 

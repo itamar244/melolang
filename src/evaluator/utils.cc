@@ -38,13 +38,14 @@ inline uint8_t StringToNote(const std::string& str) {
 
 } // namespace
 
-Phrase PhraseNodeToPhrase(const ast::PhraseLiteral* phrase) {
+PhraseValue PhraseLiteralToValue(const ast::PhraseLiteral* phrase) {
 	return {
 		atic::MapIterable<decltype(phrase->notes), std::list<uint8_t> >(
 			phrase->notes, [](const ast::IdentifierPtr& id) {
 				return StringToNote(id->name);
 			}),
-			LengthToFloat(phrase->length),
+		LengthToFloat(phrase->length),
 	};
 }
+
 }  // namespace melo::evaluator

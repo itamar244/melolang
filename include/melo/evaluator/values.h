@@ -1,14 +1,18 @@
 #pragma once
 
+#include <exception>
+#include <list>
+#include <map>
 #include <memory>
+#include <string>
 #include "melo/ast.h"
-#include "melo/phrase.h"
 
 namespace melo::evaluator {
 
 #define MELO_EVALUATOR_VALUE_TYPES(V)                                          \
 	V(FunctionValue)                                                             \
 	V(ListLiteralValue)                                                          \
+	V(PhraseValue)                                                               \
 	V(NumberValue)
 
 enum ValueType : uint8_t {
@@ -28,6 +32,10 @@ struct Value {
 	inline const NAME* As##NAME() const {                                        \
 		return type == k##NAME ? reinterpret_cast<const NAME*>(this) : nullptr;    \
 	}                                                                            \
+	inline const NAME* Expect##NAME() const {                                    \
+		if (type != k##NAME) throw std::logic_error("wrong type");                 \
+		return reinterpret_cast<const NAME*>(this);                                \
+	}                                                                            \
 	inline bool Is##NAME() const { return As##NAME() != nullptr; }
 
 	MELO_EVALUATOR_VALUE_TYPES(V)
@@ -38,14 +46,11 @@ protected:
 };
 
 
-Value* ExpressionToValue(const ast::ExpressionPtr& expr);
-
-
 struct FunctionValue : public Value {
 	// FIXME: add params when added
-	const ast::BlockPtr& body;
+	const ast::Block* body;
 
-	FunctionValue(const ast::BlockPtr& body)
+	FunctionValue(const ast::Block* body)
 			: Value(kFunctionValue), body(body) {}
 };
 
@@ -60,10 +65,14 @@ struct ListLiteralValue : public Value {
 
 	ListLiteralValue(const ast::ListLiteral* list)
 			: Value(kListLiteralValue), list(list) {}
+};
 
-	inline const Value* operator[](std::size_t i) const {
-		return ExpressionToValue(list->elements.at(i));
-	}
+struct PhraseValue : public Value {
+	const std::list<uint8_t> notes;
+	const float length;
+
+	PhraseValue(const std::list<uint8_t>& notes, float length)
+			: Value(kPhraseValue), notes(notes), length(length) {}
 };
 
 }  // namespace melo::evaluator

@@ -1,31 +1,35 @@
 #pragma once
 
 #include <exception>
-#include <map>
 #include <memory>
-#include <string>
 #include "melo/ast.h"
+#include "melo/evaluator/scope.h"
+#include "melo/evaluator/section_walker.h"
 #include "melo/evaluator/values.h"
 
 namespace melo::evaluator {
 
 class Module {
 public:
-	using Scope = std::map<std::string, Value*>;
-
 	Module(ast::BlockPtr&& program);
+	~Module();
 
 	inline const Value* GetExport(const std::string& name) {
-		auto pair = exports_.find(name);
-		if (pair == exports_.end()) {
+		auto& scope = exports_.scope();
+		auto pair = scope.find(name);
+		if (pair == scope.end()) {
 			throw std::logic_error("no such '" + name + "' export");
 		}
 		return pair->second;
 	}
 
+	inline SectionWalker GetMain() {
+		return {top_scope_, GetExport("main")->ExpectListLiteralValue()};
+	}
+
 private:
-	Scope top_scope_;
-	Scope exports_;
+	LinkedScope top_scope_;
+	LinkedScope exports_;
 	ast::BlockPtr program_;
 
 	void AddNodeToScope(const ast::StatementPtr& statement);
