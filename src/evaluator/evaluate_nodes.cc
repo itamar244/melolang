@@ -26,7 +26,19 @@ Value* EvaluateExpr(LinkedScope& scope, const ast::ExpressionPtr& expr) {
 }
 
 Value* EvaluateFunction(LinkedScope& scope, const FunctionValue* func) {
-  return EvaluateExpr(scope, func->body->statements[0]->AsReturn()->expr);
+  LinkedScope local_scope(Scope(), &scope);
+
+  for (const auto& statement  : func->body->statements) {
+    switch (statement->type) {
+      case ast::kReturn:
+        return EvaluateExpr(
+            local_scope, func->body->statements[0]->AsReturn()->expr);
+        default:
+          break;
+    }
+  }
+
+  return new NullValue();
 }
 
 } // namespace melo::evaluator

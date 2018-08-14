@@ -14,7 +14,7 @@ bool SectionWalker::HasNextPhrase() const {
 PhraseValue SectionWalker::GetCurPhrase() {
 	if (phrase_cache_ == nullptr) {
 		phrase_cache_ = EvaluateExpr(
-				scope_, section_->list->elements.at(pos_))->AsPhraseValue();
+				scope_, section_->list->elements.at(pos_))->ExpectPhraseValue();
 	}
 
 	return *phrase_cache_;

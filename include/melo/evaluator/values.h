@@ -10,6 +10,7 @@
 namespace melo::evaluator {
 
 #define MELO_EVALUATOR_VALUE_TYPES(V)                                          \
+	V(NullValue)                                                                 \
 	V(FunctionValue)                                                             \
 	V(ListLiteralValue)                                                          \
 	V(PhraseValue)                                                               \
@@ -45,6 +46,9 @@ protected:
 	Value(ValueType type) : type(type) {}
 };
 
+struct NullValue : public Value {
+	NullValue() : Value(kNullValue) {}
+};
 
 struct FunctionValue : public Value {
 	// FIXME: add params when added
