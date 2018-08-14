@@ -1,28 +1,26 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <string>
 #include "melo/evaluator/values.h"
 
 namespace melo::evaluator {
 
-using Scope = std::map<std::string, const Value*>;
-
-class LinkedScope {
+class Scope {
 public:
-  LinkedScope(Scope scope, const LinkedScope* next = nullptr)
-      : scope_(scope), next_(next) {}
+  using Data = std::map<std::string, const Value*>;
 
-  inline Scope& scope() { return scope_; }
+  Scope(const Scope* next = nullptr) : next_(next) {}
 
-  inline void Set(const std::string& name, const Value* value) {
-    scope_[name] = value;
-  }
+  ~Scope();
+
   const Value* Get(const std::string& name) const;
+  void Set(const std::string& name, const Value* value);
 
 private:
-  Scope scope_;
-  const LinkedScope* next_;
+  Data data_;
+  const Scope* next_;
 };
 
 } // namespace melo::evaluator

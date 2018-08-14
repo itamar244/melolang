@@ -9,7 +9,7 @@ namespace melo::evaluator {
 
 class SectionWalker {
 public:
-	SectionWalker(LinkedScope& scope, const ListLiteralValue* section)
+	SectionWalker(Scope& scope, const ListLiteralValue* section)
 			: scope_(scope)
 			, section_(section) {}
 
@@ -29,7 +29,7 @@ public:
 	PhraseValue GetCurPhrase();
 
 private:
-	LinkedScope& scope_;
+	Scope& scope_;
 	const ListLiteralValue* section_;
 	const PhraseValue* phrase_cache_ = nullptr;
 	std::size_t pos_ = 0;

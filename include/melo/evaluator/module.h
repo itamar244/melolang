@@ -12,12 +12,10 @@ namespace melo::evaluator {
 class Module {
 public:
 	Module(ast::BlockPtr&& program);
-	~Module();
 
 	inline const Value* GetExport(const std::string& name) {
-		auto& scope = exports_.scope();
-		auto pair = scope.find(name);
-		if (pair == scope.end()) {
+		auto pair = exports_.find(name);
+		if (pair == exports_.end()) {
 			throw std::logic_error("no such '" + name + "' export");
 		}
 		return pair->second;
@@ -28,8 +26,8 @@ public:
 	}
 
 private:
-	LinkedScope top_scope_;
-	LinkedScope exports_;
+	Scope top_scope_;
+	Scope::Data exports_;
 	ast::BlockPtr program_;
 
 	void AddNodeToScope(const ast::StatementPtr& statement);

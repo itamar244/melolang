@@ -1,6 +1,5 @@
 #include "parser/parser.h"
 #include <exception>
-#include <iostream>
 #include <utility>
 #include "melo/ast.h"
 
@@ -85,7 +84,6 @@ ast::ExpressionPtr Parser::ParseMaybeFunctionCall() {
 	if (!t_.Eat(tt::parenL)) {
 		return id;
 	}
-	std::cout << id->name << '\n';
 	std::vector<ExpressionPtr> args;
 	// FIXME: when arguments are supported add params parsing
 	t_.Expect(tt::parenR);

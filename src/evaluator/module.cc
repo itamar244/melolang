@@ -7,27 +7,17 @@
 namespace melo::evaluator {
 
 Module::Module(ast::BlockPtr&& program)
-		: program_(std::move(program))
-		, exports_(Scope())
-		, top_scope_(Scope()) {
+		: program_(std::move(program)) {
 	for (auto& statement : program_->statements) {
 		if (const auto& export_decl = statement->AsExport()) {
-			std::pair entry = {
-				export_decl->id->name,
-				EvaluateExpr(top_scope_, export_decl->value),
-			};
-			exports_.Set(entry.first, entry.second);
-			top_scope_.Set(entry.first, entry.second);
+			const auto& name = export_decl->id->name;
+			auto value = EvaluateExpr(top_scope_, export_decl->value);
+			exports_.insert({ name, value });
+			top_scope_.Set(name, value);
 		} else {
 			AddNodeToScope(statement);
 		}
 	}
-}
-
-Module::~Module() {
-	for (auto& item : exports_.scope()) atic::DeletePtr(item.second);
-	// top exports items could be deleted from exports_
-	for (auto& item : top_scope_.scope()) atic::MaybeDeletePtr(item.second);
 }
 
 void Module::AddNodeToScope(const ast::StatementPtr& statement) {
