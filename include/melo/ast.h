@@ -137,11 +137,14 @@ struct Export : public Statement {
 
 struct FunctionDeclaration : public Statement {
 	const IdentifierPtr id;
+	const std::vector<IdentifierPtr> params;
 	const BlockPtr body;
 
-	FunctionDeclaration(IdentifierPtr id, BlockPtr body)
+	FunctionDeclaration(
+			IdentifierPtr id, std::vector<IdentifierPtr> params, BlockPtr body)
 			: Statement(kFunctionDeclaration)
 			, id(std::move(id))
+			, params(std::move(params))
 			, body(std::move(body)) {}
 };
 

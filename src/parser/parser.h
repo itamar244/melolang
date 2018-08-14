@@ -8,15 +8,12 @@
 
 namespace melo::parser {
 
-class Parser {
+class Parser : private Tokenizer {
 public:
-	Parser(const State::Ptr& state);
+	using Tokenizer::Tokenizer;
 	ast::BlockPtr Parse();
 
 private:
-	State::Ptr state_;
-	Tokenizer t_;
-
 	ast::BlockPtr ParseBlock(bool top_level);
 
 	// expressions

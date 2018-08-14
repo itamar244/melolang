@@ -7,27 +7,22 @@ namespace melo::parser {
 
 using namespace ast;
 
-Parser::Parser(const State::Ptr& state)
-		: state_(state)
-		, t_(Tokenizer(state)) {}
-
 BlockPtr Parser::Parse() {
-	t_.Next();
+	Next();
 	return ParseBlock(true);
 }
 
 BlockPtr Parser::ParseBlock(bool top_level) {
 	std::vector<StatementPtr> statements;
 
-	while (!t_.Match(top_level ? tt::eof : tt::braceR)) {
+	while (!Match(top_level ? tt::eof : tt::braceR)) {
 		auto& statement = statements.emplace_back(ParseStatement(top_level));
 		if (!statement->IsFunctionDeclaration()) {
-			t_.Expect(tt::semi);
-			t_.Next();
+			ExpectAndNext(tt::semi);
 		}
 	}
 	// skipping the closing '}'
-	if (!top_level) t_.Next();
+	if (!top_level) Next();
 
 	return std::make_unique<Block>(std::move(statements));
 }
@@ -53,10 +48,10 @@ ExpressionPtr Parser::ParseExpression() {
 ListLiteralPtr Parser::ParseListLiteral() {
 	std::vector<ExpressionPtr> sections;
 
-	t_.Next();
-	while (!t_.Eat(tt::bracketR)) {
+	Next();
+	while (!Eat(tt::bracketR)) {
 		sections.push_back(ParseExpression());
-		if (!t_.Eat(tt::comma) && !t_.Match(tt::bracketR)) {
+		if (!Eat(tt::comma) && !Match(tt::bracketR)) {
 			throw std::logic_error("unfinished section");
 		}
 	}
@@ -65,13 +60,12 @@ ListLiteralPtr Parser::ParseListLiteral() {
 }
 
 PhraseLiteralPtr Parser::ParsePhraseLiteral() {
-	t_.Expect(tt::parenL);
-	t_.Next();
-	t_.Expect(tt::num);
+	ExpectAndNext(tt::parenL);
+	Expect(tt::num);
 	auto length = ParseNumber();
 	std::vector<IdentifierPtr> notes;
 
-	while (!t_.Eat(tt::parenR)) {
+	while (!Eat(tt::parenR)) {
 		notes.push_back(ParseIdentifier());
 	}
 
@@ -81,25 +75,24 @@ PhraseLiteralPtr Parser::ParsePhraseLiteral() {
 
 ast::ExpressionPtr Parser::ParseMaybeFunctionCall() {
 	auto id = ParseIdentifier();
-	if (!t_.Eat(tt::parenL)) {
+	if (!Eat(tt::parenL)) {
 		return id;
 	}
 	std::vector<ExpressionPtr> args;
 	// FIXME: when arguments are supported add params parsing
-	t_.Expect(tt::parenR);
-	t_.Next();
+	ExpectAndNext(tt::parenR);
 	return std::make_unique<FunctionCall>(std::move(id), std::move(args));
 }
 
 IdentifierPtr Parser::ParseIdentifier() {
 	auto id = std::make_unique<Identifier>(state_->value);
-	t_.Next();
+	Next();
 	return std::move(id);
 }
 
 NumericLiteralPtr Parser::ParseNumber() {
 	auto num = std::make_unique<NumericLiteral>(state_->value);
-	t_.Next();
+	Next();
 	return std::move(num);
 }
 
@@ -134,26 +127,38 @@ StatementPtr Parser::ParseStatement(bool top_level) {
 }
 
 ExportPtr Parser::ParseExport() {
-	t_.Next();
-	t_.Expect(tt::name);
+	Next();
+	Expect(tt::name);
 
 	return std::make_unique<Export>(ParseIdentifier(), ParseExpression());
 }
 
 FunctionDeclarationPtr Parser::ParseFunctionDeclaration() {
-	t_.Next();
-	t_.Expect(tt::name);
+	Next();
+	Expect(tt::name);
 	auto id = ParseIdentifier();
-	t_.Expect(tt::braceL);
-	t_.Next();
+
+	ExpectAndNext(tt::parenL);
+	std::vector<IdentifierPtr> params;
+
+	while (!Eat(tt::parenR)) {
+		Expect(tt::name);
+		params.push_back(ParseIdentifier());
+		if (!Eat(tt::comma) && !Match(tt::parenR)) {
+			throw std::logic_error("unfinished section");
+		}
+	}
+
+	ExpectAndNext(tt::braceL);
 
 	return std::make_unique<FunctionDeclaration>(
 			std::move(id),
+			std::move(params),
 			ParseBlock(false));
 }
 
 ReturnPtr Parser::ParseReturn() {
-	t_.Next();
+	Next();
 	return std::make_unique<Return>(ParseExpression());
 }
 

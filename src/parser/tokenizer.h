@@ -15,17 +15,22 @@ public:
 
 	void Next();
 
-	inline bool Match(TokenType type) {
+	inline bool Match(TokenType type) const {
 		return type == state_->type;
 	}
 
-	inline void Expect(TokenType type) noexcept(false) {
+	inline void Expect(TokenType type) const noexcept(false) {
 		if (!Match(type)) {
 			throw std::logic_error(
 				"wrong type: " + TokenTypeToString(state_->type) +
 				", expected: " + TokenTypeToString(type)
 			);
 		}
+	}
+
+	inline void ExpectAndNext(TokenType type) {
+		Expect(type);
+		Next();
 	}
 
 	inline bool Eat(TokenType type) {
@@ -36,9 +41,10 @@ public:
 		return false;
 	}
 
-private:
+protected:
 	State::Ptr state_;
 
+private:
 	void SkipLine();
 	void ReadIdentifier();
 	void ReadNumber();
