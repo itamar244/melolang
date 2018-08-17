@@ -5,6 +5,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "melo/zone.h"
 
 namespace melo::ast {
 
@@ -22,7 +23,8 @@ namespace melo::ast {
 	V(Identifier)                                                                \
 	V(FunctionCall)                                                              \
 	V(NoteLiteral)                                                               \
-	V(NumericLiteral)
+	V(NumericLiteral)                                                            \
+	V(Spread)
 
 #define MELO_AST_NODE_TYPES(V)                                                 \
 	MELO_WRAPPERS_NODE_TYPES(V)                                                  \
@@ -35,30 +37,33 @@ enum NodeType : uint8_t {
 #undef DECLARE_TYPE_ENUM
 };
 
-#define FR_DECL(NAME)                                                          \
-	struct NAME;                                                                 \
-	using NAME##Ptr = std::unique_ptr<NAME>;
+#define FR_DECL(NAME) struct NAME;                                                                 
 
 	MELO_AST_NODE_TYPES(FR_DECL)
-	FR_DECL(AstNode)
-	FR_DECL(Expression)
-	FR_DECL(Statement)
 #undef FR_DECL
 
 struct AstNode {
 	const NodeType type;
 
+	virtual ~AstNode() {}
+
 #define V(NAME)                                                                \
-	inline NAME* As##NAME() {                                                    \
-		return type == k##NAME ? reinterpret_cast<NAME*>(this) : nullptr;          \
+	inline const NAME* As##NAME() const  {                                       \
+		return type == k##NAME ? reinterpret_cast<const NAME*>(this) : nullptr;    \
 	}                                                                            \
-	inline bool Is##NAME() { return As##NAME() != nullptr; }
+	inline bool Is##NAME() const { return As##NAME() != nullptr; }
 
 	MELO_AST_NODE_TYPES(V)
 #undef V
 
+	void* operator new(std::size_t size, Zone* zone) { return zone->New(size); }
+
 protected:
 	AstNode(NodeType type) : type(type) {}
+
+private:
+	// for accidently preventing call `operator new` without Zone*
+	void* operator new(std::size_t size);
 };
 
 struct Statement : public AstNode {
@@ -75,21 +80,11 @@ struct Identifier : public Expression {
 	Identifier(const std::string& name) : Expression(kIdentifier), name(name) {}
 };
 
-struct PhraseLiteral : public Expression {
-	const NumericLiteralPtr length;
-	const std::vector<IdentifierPtr> notes;
-
-	PhraseLiteral(NumericLiteralPtr length, std::vector<IdentifierPtr> notes)
-			: Expression(kPhraseLiteral)
-			, length(std::move(length))
-			, notes(std::move(notes)) {}
-};
-
 struct ListLiteral : public Expression {
-	const std::vector<ExpressionPtr> elements;
+	const std::vector<Expression*> elements;
 
-	ListLiteral(std::vector<ExpressionPtr> elements)
-			: Expression(kListLiteral), elements(std::move(elements)) {}
+	ListLiteral(std::vector<Expression*> elements)
+			: Expression(kListLiteral), elements(elements) {}
 };
 
 struct NoteLiteral : public Expression {
@@ -107,51 +102,85 @@ struct NumericLiteral : public Expression {
 			: Expression(kNumericLiteral), value(value) {}
 };
 
-struct FunctionCall : public Expression {
-	const IdentifierPtr id;
-	const std::vector<ExpressionPtr> args;
+struct PhraseLiteral : public Expression {
+	const NumericLiteral length;
+	const std::vector<Identifier> notes;
 
-	FunctionCall(IdentifierPtr id, std::vector<ExpressionPtr> args)
+	PhraseLiteral(NumericLiteral length, std::vector<Identifier> notes)
+			: Expression(kPhraseLiteral)
+			, length(length)
+			, notes(notes) {}
+};
+
+struct Spread : public Expression {
+	const Expression* value;
+
+	Spread(Expression* value)
+			: Expression(kSpread), value(value) {}
+};
+
+struct FunctionCall : public Expression {
+	const Identifier id;
+	const std::vector<Expression*> args;
+
+	FunctionCall(Identifier id, std::vector<Expression*> args)
 			: Expression(kFunctionCall)
-			, id(std::move(id))
-			, args(std::move(args)) {}
+			, id(id)
+			, args(args) {}
 };
 
 struct Block : public Statement {
-	const std::vector<StatementPtr> statements;
+	const std::vector<const Statement*> statements;
 
-	Block(std::vector<StatementPtr> statements)
-			: Statement(kBlock), statements(std::move(statements)) {}
+	Block(std::vector<const Statement*> statements)
+			: Statement(kBlock), statements(statements) {}
 };
 
 struct Export : public Statement {
-	const IdentifierPtr id;
-	// FIX: make const
-	ExpressionPtr value;
+	const Identifier id;
+	const Expression* value;
 
-	Export(IdentifierPtr id, ExpressionPtr value)
+	Export(Identifier id, const Expression* value)
 			: Statement(kExport)
-			, id(std::move(id))
-			, value(std::move(value)) {}
+			, id(id)
+			, value(value) {}
 };
 
 struct FunctionDeclaration : public Statement {
-	const IdentifierPtr id;
-	const std::vector<IdentifierPtr> params;
-	const BlockPtr body;
+	const Identifier id;
+	const std::vector<Identifier> params;
+	const Block* body;
 
 	FunctionDeclaration(
-			IdentifierPtr id, std::vector<IdentifierPtr> params, BlockPtr body)
+			Identifier id, std::vector<Identifier> params, const Block* body)
 			: Statement(kFunctionDeclaration)
-			, id(std::move(id))
-			, params(std::move(params))
-			, body(std::move(body)) {}
+			, id(id)
+			, params(params)
+			, body(body) {}
 };
 
 struct Return : public Statement {
-	const ExpressionPtr expr;
+	const Expression* expr;
 
-	Return(ExpressionPtr expr) : Statement(kReturn), expr(std::move(expr)) {}
+	Return(Expression* expr) : Statement(kReturn), expr(expr) {}
+};
+
+
+class NodeFactory {
+public:
+	NodeFactory(Zone* zone) : zone_(zone) {}
+
+#define NODE_FACTORIES(NAME)                                                   \
+ 	template<typename... Args>                                                   \
+	NAME* New##NAME(Args... args) {                                              \
+		return new (zone_) NAME(args...);                                          \
+	}
+
+	MELO_AST_NODE_TYPES(NODE_FACTORIES)
+#undef NODE_FACTORIES
+
+private:
+	Zone* zone_;
 };
 
 } // namespace melo::ast

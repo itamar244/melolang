@@ -6,6 +6,7 @@
 #include "melo/evaluator/module.h"
 #include "melo/evaluator/section_walker.h"
 #include "melo/evaluator/values.h"
+#include "melo/zone.h"
 
 namespace melo {
 
@@ -14,13 +15,14 @@ using evaluator::Module;
 using evaluator::SectionWalker;
 using evaluator::PhraseValue;
 
-ast::BlockPtr Parse(std::istream& stream);
+ast::Block* Parse(std::istream& stream, Zone* zone);
 
 inline Module CreateModule(std::istream& stream) {
-	return {Parse(stream)};
+	auto zone = new Zone();
+	return {Parse(stream, zone), zone};
 }
-inline Module CreateModule(ast::BlockPtr&& program) {
-	return {std::move(program)};
+inline Module CreateModule(ast::Block* program) {
+	return {program, new Zone()};
 }
 
 } // namespace melo

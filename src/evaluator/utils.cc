@@ -13,12 +13,12 @@ const std::map<char, uint8_t> kNotesToInt({
 	{'C', 0}, {'D', 2}, {'E', 4}, {'F', 5}, {'G', 7}, {'A', 9}, {'B', 11},
 });
 
-inline float LengthToFloat(const ast::NumericLiteralPtr& length) {
-	auto size = length->value.size();
-	bool plus_half = *length->value.crbegin() == '.';
+inline float LengthToFloat(const ast::NumericLiteral& length) {
+	auto size = length.value.size();
+	bool plus_half = length.value.at(size - 1) == '.';
 
 	if (plus_half) --size;
-	auto buffer = length->value.substr(0, size).c_str();
+	auto buffer = length.value.substr(0, size).c_str();
 	float length_value = 32 / float(std::atoi(buffer));
 
 	return plus_half ? length_value * 1.5 : length_value;
@@ -41,8 +41,8 @@ inline uint8_t StringToNote(const std::string& str) {
 PhraseValue PhraseLiteralToValue(const ast::PhraseLiteral* phrase) {
 	return {
 		atic::MapIterable<decltype(phrase->notes), std::list<uint8_t> >(
-			phrase->notes, [](const ast::IdentifierPtr& id) {
-				return StringToNote(id->name);
+			phrase->notes, [](const ast::Identifier id) {
+				return StringToNote(id.name);
 			}),
 		LengthToFloat(phrase->length),
 	};

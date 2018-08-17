@@ -4,7 +4,7 @@
 
 namespace melo::evaluator {
 
-Value* EvaluateExpr(Scope& scope, const ast::ExpressionPtr& expr) {
+Value* EvaluateExpr(Scope& scope, const ast::Expression* expr) {
   switch (expr->type) {
     case ast::kNumericLiteral:
       return new NumberValue(
@@ -14,7 +14,7 @@ Value* EvaluateExpr(Scope& scope, const ast::ExpressionPtr& expr) {
     case ast::kFunctionCall:
       return EvaluateFunction(
           scope,
-          scope.Get(expr->AsFunctionCall()->id->name)->ExpectFunctionValue());
+          scope.Get(expr->AsFunctionCall()->id.name)->ExpectFunctionValue());
     case ast::kPhraseLiteral:
       return new PhraseValue(
           std::move(PhraseLiteralToValue(expr->AsPhraseLiteral())));
@@ -28,7 +28,7 @@ Value* EvaluateExpr(Scope& scope, const ast::ExpressionPtr& expr) {
 Value* EvaluateFunction(Scope& scope, const FunctionValue* func) {
   Scope local_scope(&scope);
 
-  for (const auto& statement  : func->body->statements) {
+  for (const auto& statement : func->body->statements) {
     switch (statement->type) {
       case ast::kReturn:
         return EvaluateExpr(local_scope, statement->AsReturn()->expr);

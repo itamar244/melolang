@@ -7,13 +7,13 @@ namespace melo::parser {
 
 using namespace ast;
 
-BlockPtr Parser::Parse() {
+Block* Parser::Parse() {
 	Next();
 	return ParseBlock(true);
 }
 
-BlockPtr Parser::ParseBlock(bool top_level) {
-	std::vector<StatementPtr> statements;
+Block* Parser::ParseBlock(bool top_level) {
+	std::vector<const Statement*> statements;
 
 	while (!Match(top_level ? tt::eof : tt::braceR)) {
 		auto& statement = statements.emplace_back(ParseStatement(top_level));
@@ -24,18 +24,18 @@ BlockPtr Parser::ParseBlock(bool top_level) {
 	// skipping the closing '}'
 	if (!top_level) Next();
 
-	return std::make_unique<Block>(std::move(statements));
+	return NewBlock(statements);
 }
 
 // ------------------------------- expressions ---------------------------------
-ExpressionPtr Parser::ParseExpression() {
+Expression* Parser::ParseExpression() {
 	switch (state_->type) {
 		case tt::bracketL:
-			return ParseListLiteral();
+			return NewListLiteral(ParseListLiteral());
 		case tt::parenL:
-			return ParsePhraseLiteral();
+			return NewPhraseLiteral(ParsePhraseLiteral());
 		case tt::num:
-			return ParseNumber();
+			return NewNumericLiteral(ParseNumber());
 		case tt::name:
 			return ParseMaybeFunctionCall();
 		default:
@@ -45,59 +45,59 @@ ExpressionPtr Parser::ParseExpression() {
 	}
 }
 
-ListLiteralPtr Parser::ParseListLiteral() {
-	std::vector<ExpressionPtr> sections;
+ListLiteral Parser::ParseListLiteral() {
+	std::vector<Expression*> elements;
 
 	Next();
 	while (!Eat(tt::bracketR)) {
-		sections.push_back(ParseExpression());
+		elements.push_back(ParseExpression());
 		if (!Eat(tt::comma) && !Match(tt::bracketR)) {
 			throw std::logic_error("unfinished section");
 		}
 	}
 
-	return std::make_unique<ListLiteral>(std::move(sections));
+	return {elements};
 }
 
-PhraseLiteralPtr Parser::ParsePhraseLiteral() {
+PhraseLiteral Parser::ParsePhraseLiteral() {
 	ExpectAndNext(tt::parenL);
 	Expect(tt::num);
 	auto length = ParseNumber();
-	std::vector<IdentifierPtr> notes;
+	std::vector<Identifier> notes;
 
 	while (!Eat(tt::parenR)) {
 		notes.push_back(ParseIdentifier());
 	}
 
-	return std::make_unique<PhraseLiteral>(std::move(length), std::move(notes));
+	return {length, notes};
 }
 
 
-ast::ExpressionPtr Parser::ParseMaybeFunctionCall() {
+Expression* Parser::ParseMaybeFunctionCall() {
 	auto id = ParseIdentifier();
 	if (!Eat(tt::parenL)) {
-		return id;
+		return NewIdentifier(id);
 	}
-	std::vector<ExpressionPtr> args;
+	std::vector<Expression*> args;
 	// FIXME: when arguments are supported add params parsing
 	ExpectAndNext(tt::parenR);
-	return std::make_unique<FunctionCall>(std::move(id), std::move(args));
+	return NewFunctionCall(id, args);
 }
 
-IdentifierPtr Parser::ParseIdentifier() {
-	auto id = std::make_unique<Identifier>(state_->value);
+Identifier Parser::ParseIdentifier() {
+	Identifier id(state_->value);
 	Next();
-	return std::move(id);
+	return id;
 }
 
-NumericLiteralPtr Parser::ParseNumber() {
-	auto num = std::make_unique<NumericLiteral>(state_->value);
+NumericLiteral Parser::ParseNumber() {
+	NumericLiteral num(state_->value);
 	Next();
-	return std::move(num);
+	return num;
 }
 
 // ------------------------------- statements ----------------------------------
-StatementPtr Parser::ParseStatement(bool top_level) {
+Statement* Parser::ParseStatement(bool top_level) {
 	switch (state_->type) {
 		// case tt::_var:
 		// 	return ParseVarDeclaration();
@@ -126,20 +126,20 @@ StatementPtr Parser::ParseStatement(bool top_level) {
 	}
 }
 
-ExportPtr Parser::ParseExport() {
+Export* Parser::ParseExport() {
 	Next();
 	Expect(tt::name);
 
-	return std::make_unique<Export>(ParseIdentifier(), ParseExpression());
+	return NewExport(ParseIdentifier(), ParseExpression());
 }
 
-FunctionDeclarationPtr Parser::ParseFunctionDeclaration() {
+FunctionDeclaration* Parser::ParseFunctionDeclaration() {
 	Next();
 	Expect(tt::name);
 	auto id = ParseIdentifier();
 
 	ExpectAndNext(tt::parenL);
-	std::vector<IdentifierPtr> params;
+	std::vector<Identifier> params;
 
 	while (!Eat(tt::parenR)) {
 		Expect(tt::name);
@@ -151,15 +151,12 @@ FunctionDeclarationPtr Parser::ParseFunctionDeclaration() {
 
 	ExpectAndNext(tt::braceL);
 
-	return std::make_unique<FunctionDeclaration>(
-			std::move(id),
-			std::move(params),
-			ParseBlock(false));
+	return NewFunctionDeclaration(id, params, ParseBlock(false));
 }
 
-ReturnPtr Parser::ParseReturn() {
+Return* Parser::ParseReturn() {
 	Next();
-	return std::make_unique<Return>(ParseExpression());
+	return NewReturn(ParseExpression());
 }
 
 } // namespace melo::parser

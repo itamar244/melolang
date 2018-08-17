@@ -6,11 +6,11 @@
 
 namespace melo::evaluator {
 
-Module::Module(ast::BlockPtr&& program)
-		: program_(std::move(program)) {
-	for (auto& statement : program_->statements) {
+Module::Module(ast::Block* program, Zone* zone)
+		: program_(program), zone_(zone) {
+	for (auto statement : program_->statements) {
 		if (const auto& export_decl = statement->AsExport()) {
-			const auto& name = export_decl->id->name;
+			const auto& name = export_decl->id.name;
 			auto value = EvaluateExpr(top_scope_, export_decl->value);
 			exports_.insert({ name, value });
 			top_scope_.Set(name, value);
@@ -20,11 +20,15 @@ Module::Module(ast::BlockPtr&& program)
 	}
 }
 
-void Module::AddNodeToScope(const ast::StatementPtr& statement) {
+Module::~Module() {
+	delete zone_;
+}
+
+void Module::AddNodeToScope(const ast::Statement* statement) {
 	switch (statement->type) {
 		case ast::kFunctionDeclaration: {
 			auto func = statement->AsFunctionDeclaration();
-			top_scope_.Set(func->id->name, new FunctionValue(func->body.get()));
+			top_scope_.Set(func->id.name, new FunctionValue(func->body));
 			break;
 		}
 	}

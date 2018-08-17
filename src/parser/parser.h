@@ -3,32 +3,36 @@
 #include <memory>
 #include <string>
 #include "melo/ast.h"
+#include "melo/zone.h"
 #include "parser/state.h"
 #include "parser/tokenizer.h"
 
 namespace melo::parser {
 
-class Parser : private Tokenizer {
+class Parser : private Tokenizer, private ast::NodeFactory {
 public:
-	using Tokenizer::Tokenizer;
-	ast::BlockPtr Parse();
+	Parser(State::Ptr state, Zone* zone)
+			: Tokenizer(state), NodeFactory(zone) {}
+
+	ast::Block* Parse();
 
 private:
-	ast::BlockPtr ParseBlock(bool top_level);
+	ast::Block* ParseBlock(bool top_level);
 
 	// expressions
-	ast::ExpressionPtr ParseExpression();
-	ast::IdentifierPtr ParseIdentifier();
-	ast::ExpressionPtr ParseMaybeFunctionCall();
-	ast::NumericLiteralPtr ParseNumber();
-	ast::ListLiteralPtr ParseListLiteral();
-	ast::PhraseLiteralPtr ParsePhraseLiteral();
+	ast::Expression* ParseExpression();
+	ast::ListLiteral ParseListLiteral();
+	ast::PhraseLiteral ParsePhraseLiteral();
+	ast::Identifier ParseIdentifier();
+	ast::Expression* ParseMaybeFunctionCall();
+	ast::NumericLiteral ParseNumber();
+	ast::Spread ParseSpread();
 
 	// statements
-	ast::StatementPtr ParseStatement(bool top_level);
-	ast::ExportPtr ParseExport();
-	ast::FunctionDeclarationPtr ParseFunctionDeclaration();
-	ast::ReturnPtr ParseReturn();
+	ast::Statement* ParseStatement(bool top_level);
+	ast::Export* ParseExport();
+	ast::FunctionDeclaration* ParseFunctionDeclaration();
+	ast::Return* ParseReturn();
 };
 
 } // namespace melo::parser

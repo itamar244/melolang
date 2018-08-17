@@ -24,10 +24,8 @@ enum ValueType : uint8_t {
 
 #define FR_DECL(NAME)	                                                         \
 	struct NAME;                                                                 \
-	using NAME##Ptr = std::unique_ptr<NAME>;
 
 	MELO_EVALUATOR_VALUE_TYPES(FR_DECL)
-	FR_DECL(Value)
 #undef FR_DECL
 
 struct Value {
