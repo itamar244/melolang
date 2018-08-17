@@ -43,6 +43,8 @@ void Tokenizer::GetTokenFromChar(char ch) {
 			return FinishToken(tt::bracketR);
 		case ';':
 			return FinishToken(tt::semi);
+		case '.':
+			return ReadDot();
 		default:
 			FinishTokenWithValue(tt::error);
 	}
@@ -70,6 +72,18 @@ void Tokenizer::ReadIdentifier() {
 		FinishToken(keyword->second);
 	} else {
 		FinishToken(tt::name, word);
+	}
+}
+
+void Tokenizer::ReadDot() {
+	if (state_->CurChar() == '.') {
+		if (state_->CurChar() == '.') {
+			FinishToken(tt::spread);
+		} else {
+			throw std::logic_error("'..', unexpected dot");
+		}
+	} else {
+		FinishToken(tt::dot);
 	}
 }
 

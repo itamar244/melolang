@@ -17,6 +17,8 @@ namespace melo::parser {
 	                                                                             \
 	V(semi)                                                                      \
 	V(comma)                                                                     \
+	V(dot)                                                                       \
+	V(spread)                                                                    \
 	V(eq)                                                                        \
 	V(bracketL)                                                                  \
 	V(bracketR)                                                                  \

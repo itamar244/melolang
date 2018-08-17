@@ -33,6 +33,11 @@ public:
 		Next();
 	}
 
+	// inline void ExpectNext(TokenType type) {
+	// 	Next();
+	// 	Expect(type);
+	// }
+
 	inline bool Eat(TokenType type) {
 		if (Match(type)) {
 			Next();
@@ -46,9 +51,10 @@ protected:
 
 private:
 	void SkipLine();
+	void GetTokenFromChar(char);
+	void ReadDot();
 	void ReadIdentifier();
 	void ReadNumber();
-	void GetTokenFromChar(char);
 	void FinishToken(TokenType, const std::string& value = "");
 	void FinishTokenWithValue(TokenType);
 	void SkipSpace();
