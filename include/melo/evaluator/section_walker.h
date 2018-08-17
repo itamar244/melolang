@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <atic/ptr.h>
 #include "melo/evaluator/scope.h"
 #include "melo/evaluator/values.h"
@@ -13,9 +12,7 @@ public:
 			: scope_(scope)
 			, section_(section) {}
 
-	~SectionWalker() {
-		atic::MaybeDeletePtr(phrase_cache_);
-	}
+	~SectionWalker();
 
 	inline std::size_t pos() const {
 		return pos_;
