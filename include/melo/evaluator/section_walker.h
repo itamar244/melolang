@@ -26,7 +26,7 @@ public:
 	}
 
 	bool HasNextPhrase() const;
-	PhraseValue GetCurPhrase();
+	const PhraseValue* GetCurPhrase();
 
 private:
 	Scope& scope_;
