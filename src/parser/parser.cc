@@ -31,11 +31,11 @@ Block* Parser::ParseBlock(bool top_level) {
 Expression* Parser::ParseExpression() {
 	switch (state_->type) {
 		case tt::bracketL:
-			return NewListLiteral(ParseListLiteral());
+			return ParseListLiteral();
 		case tt::parenL:
-			return NewPhraseLiteral(ParsePhraseLiteral());
+			return ParsePhraseLiteral();
 		case tt::num:
-			return NewNumericLiteral(ParseNumber());
+			return ParseNumber();
 		case tt::name:
 			return ParseMaybeFunctionCall();
 		default:
@@ -45,7 +45,7 @@ Expression* Parser::ParseExpression() {
 	}
 }
 
-ListLiteral Parser::ParseListLiteral() {
+ListLiteral* Parser::ParseListLiteral() {
 	std::vector<Expression*> elements;
 
 	Next();
@@ -56,27 +56,27 @@ ListLiteral Parser::ParseListLiteral() {
 		}
 	}
 
-	return {elements};
+	return NewListLiteral(elements);
 }
 
-PhraseLiteral Parser::ParsePhraseLiteral() {
+PhraseLiteral* Parser::ParsePhraseLiteral() {
 	ExpectAndNext(tt::parenL);
 	Expect(tt::num);
 	auto length = ParseNumber();
-	std::vector<Identifier> notes;
+	std::vector<Identifier*> notes;
 
 	while (!Eat(tt::parenR)) {
 		notes.push_back(ParseIdentifier());
 	}
 
-	return {length, notes};
+	return NewPhraseLiteral(length, notes);
 }
 
 
 Expression* Parser::ParseMaybeFunctionCall() {
 	auto id = ParseIdentifier();
 	if (!Eat(tt::parenL)) {
-		return NewIdentifier(id);
+		return id;
 	}
 	std::vector<Expression*> args;
 	// FIXME: when arguments are supported add params parsing
@@ -84,14 +84,14 @@ Expression* Parser::ParseMaybeFunctionCall() {
 	return NewFunctionCall(id, args);
 }
 
-Identifier Parser::ParseIdentifier() {
-	Identifier id(state_->value);
+Identifier* Parser::ParseIdentifier() {
+	auto id = NewIdentifier(state_->value);
 	Next();
 	return id;
 }
 
-NumericLiteral Parser::ParseNumber() {
-	NumericLiteral num(state_->value);
+NumericLiteral* Parser::ParseNumber() {
+	auto num = NewNumericLiteral(state_->value);
 	Next();
 	return num;
 }
@@ -139,7 +139,7 @@ FunctionDeclaration* Parser::ParseFunctionDeclaration() {
 	auto id = ParseIdentifier();
 
 	ExpectAndNext(tt::parenL);
-	std::vector<Identifier> params;
+	std::vector<Identifier*> params;
 
 	while (!Eat(tt::parenR)) {
 		Expect(tt::name);

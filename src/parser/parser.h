@@ -21,12 +21,12 @@ private:
 
 	// expressions
 	ast::Expression* ParseExpression();
-	ast::ListLiteral ParseListLiteral();
-	ast::PhraseLiteral ParsePhraseLiteral();
-	ast::Identifier ParseIdentifier();
+	ast::ListLiteral* ParseListLiteral();
+	ast::PhraseLiteral* ParsePhraseLiteral();
+	ast::Identifier* ParseIdentifier();
 	ast::Expression* ParseMaybeFunctionCall();
-	ast::NumericLiteral ParseNumber();
-	ast::Spread ParseSpread();
+	ast::NumericLiteral* ParseNumber();
+	ast::Spread* ParseSpread();
 
 	// statements
 	ast::Statement* ParseStatement(bool top_level);

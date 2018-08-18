@@ -45,8 +45,6 @@ enum NodeType : uint8_t {
 struct AstNode {
 	const NodeType type;
 
-	virtual ~AstNode() {}
-
 #define V(NAME)                                                                \
 	inline const NAME* As##NAME() const  {                                       \
 		return type == k##NAME ? reinterpret_cast<const NAME*>(this) : nullptr;    \
@@ -103,10 +101,11 @@ struct NumericLiteral : public Expression {
 };
 
 struct PhraseLiteral : public Expression {
-	const NumericLiteral length;
-	const std::vector<Identifier> notes;
+	const NumericLiteral* length;
+	const std::vector<Identifier*> notes;
 
-	PhraseLiteral(NumericLiteral length, std::vector<Identifier> notes)
+	PhraseLiteral(
+			const NumericLiteral* length, std::vector<Identifier*>& notes)
 			: Expression(kPhraseLiteral)
 			, length(length)
 			, notes(notes) {}
@@ -115,12 +114,11 @@ struct PhraseLiteral : public Expression {
 struct Spread : public Expression {
 	const Expression* value;
 
-	Spread(Expression* value)
-			: Expression(kSpread), value(value) {}
+	Spread(Expression* value) : Expression(kSpread), value(value) {}
 };
 
 struct FunctionCall : public Expression {
-	const Identifier id;
+	const Identifier* id;
 	const std::vector<Expression*> args;
 
 	FunctionCall(Identifier id, std::vector<Expression*> args)

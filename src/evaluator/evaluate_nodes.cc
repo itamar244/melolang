@@ -14,7 +14,7 @@ Value* EvaluateExpr(Scope& scope, const ast::Expression* expr) {
     case ast::kFunctionCall:
       return EvaluateFunction(
           scope,
-          scope.Get(expr->AsFunctionCall()->id.name)->ExpectFunctionValue());
+          scope.Get(expr->AsFunctionCall()->id->name)->ExpectFunctionValue());
     case ast::kPhraseLiteral:
       return new PhraseValue(
           std::move(PhraseLiteralToValue(expr->AsPhraseLiteral())));

@@ -41,8 +41,8 @@ inline uint8_t StringToNote(const std::string& str) {
 PhraseValue PhraseLiteralToValue(const ast::PhraseLiteral* phrase) {
 	return {
 		atic::MapIterable<decltype(phrase->notes), std::list<uint8_t> >(
-			phrase->notes, [](const ast::Identifier id) {
-				return StringToNote(id.name);
+			phrase->notes, [](const ast::Identifier* id) {
+				return StringToNote(id->name);
 			}),
 		LengthToFloat(phrase->length),
 	};
