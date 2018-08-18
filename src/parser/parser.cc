@@ -85,13 +85,13 @@ Expression* Parser::ParseMaybeFunctionCall() {
 }
 
 Identifier* Parser::ParseIdentifier() {
-	auto id = NewIdentifier(state_->value);
+	auto id = NewIdentifier(CreateString(state_->value));
 	Next();
 	return id;
 }
 
 NumericLiteral* Parser::ParseNumber() {
-	auto num = NewNumericLiteral(state_->value);
+	auto num = NewNumericLiteral(CreateString(state_->value));
 	Next();
 	return num;
 }

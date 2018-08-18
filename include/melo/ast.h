@@ -6,6 +6,7 @@
 #include <utility>
 #include <vector>
 #include "melo/zone.h"
+#include "melo/string.h"
 
 namespace melo::ast {
 
@@ -22,7 +23,6 @@ namespace melo::ast {
 	V(PhraseLiteral)                                                             \
 	V(Identifier)                                                                \
 	V(FunctionCall)                                                              \
-	V(NoteLiteral)                                                               \
 	V(NumericLiteral)                                                            \
 	V(Spread)
 
@@ -37,7 +37,7 @@ enum NodeType : uint8_t {
 #undef DECLARE_TYPE_ENUM
 };
 
-#define FR_DECL(NAME) struct NAME;                                                                 
+#define FR_DECL(NAME) struct NAME;
 
 	MELO_AST_NODE_TYPES(FR_DECL)
 #undef FR_DECL
@@ -73,9 +73,9 @@ struct Expression : public AstNode {
 };
 
 struct Identifier : public Expression {
-	const std::string name;
+	const String name;
 
-	Identifier(const std::string& name) : Expression(kIdentifier), name(name) {}
+	Identifier(const String& name) : Expression(kIdentifier), name(name) {}
 };
 
 struct ListLiteral : public Expression {
@@ -85,18 +85,10 @@ struct ListLiteral : public Expression {
 			: Expression(kListLiteral), elements(elements) {}
 };
 
-struct NoteLiteral : public Expression {
-	const std::string name;
-	const uint8_t octave;
-
-	NoteLiteral(const std::string& name, uint8_t octave)
-			: Expression(kNoteLiteral), name(name), octave(octave) {}
-};
-
 struct NumericLiteral : public Expression {
-	const std::string value;
+	const String value;
 
-	NumericLiteral(const std::string& value)
+	NumericLiteral(const String& value)
 			: Expression(kNumericLiteral), value(value) {}
 };
 
@@ -121,39 +113,39 @@ struct FunctionCall : public Expression {
 	const Identifier* id;
 	const std::vector<Expression*> args;
 
-	FunctionCall(Identifier id, std::vector<Expression*> args)
+	FunctionCall(const Identifier* id, std::vector<Expression*>& args)
 			: Expression(kFunctionCall)
 			, id(id)
-			, args(args) {}
+			, args(std::move(args)) {}
 };
 
 struct Block : public Statement {
 	const std::vector<const Statement*> statements;
 
-	Block(std::vector<const Statement*> statements)
-			: Statement(kBlock), statements(statements) {}
+	Block(std::vector<const Statement*>& statements)
+			: Statement(kBlock), statements(std::move(statements)) {}
 };
 
 struct Export : public Statement {
-	const Identifier id;
+	const Identifier* id;
 	const Expression* value;
 
-	Export(Identifier id, const Expression* value)
+	Export(const Identifier* id, const Expression* value)
 			: Statement(kExport)
 			, id(id)
 			, value(value) {}
 };
 
 struct FunctionDeclaration : public Statement {
-	const Identifier id;
-	const std::vector<Identifier> params;
+	const Identifier* id;
+	const std::vector<Identifier*> params;
 	const Block* body;
 
 	FunctionDeclaration(
-			Identifier id, std::vector<Identifier> params, const Block* body)
+			const Identifier* id, std::vector<Identifier*>& params, const Block* body)
 			: Statement(kFunctionDeclaration)
 			, id(id)
-			, params(params)
+			, params(std::move(params))
 			, body(body) {}
 };
 
@@ -167,6 +159,10 @@ struct Return : public Statement {
 class NodeFactory {
 public:
 	NodeFactory(Zone* zone) : zone_(zone) {}
+
+	inline String CreateString(const std::string& str) {
+		return String(zone_, str);
+	}
 
 #define NODE_FACTORIES(NAME)                                                   \
  	template<typename... Args>                                                   \
