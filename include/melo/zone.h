@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdlib>
-#include <list>
+#include <atic/structs.h>
 
 namespace melo {
 
@@ -11,7 +11,7 @@ public:
   void* New(std::size_t size);
 
 private:
-  std::list<void*> ptrs_;
+  atic::Stack<void*> ptrs_;
 };
 
 } // namespace melo

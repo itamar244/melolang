@@ -4,14 +4,14 @@
 namespace melo {
 
 Zone::~Zone() {
-  for (auto ptr : ptrs_) {
-    std::free(ptr);
+  while (!ptrs_.empty()) {
+    std::free(ptrs_.pop());
   }
 }
 
 void* Zone::New(std::size_t size) {
   void* ptr = std::malloc(size);
-  ptrs_.push_back(ptr);
+  ptrs_.push_front(ptr);
   return ptr;
 }
 
