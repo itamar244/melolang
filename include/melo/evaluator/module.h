@@ -2,6 +2,7 @@
 
 #include <exception>
 #include <memory>
+#include <string>
 #include "melo/ast.h"
 #include "melo/evaluator/scope.h"
 #include "melo/evaluator/section_walker.h"
@@ -16,9 +17,9 @@ public:
 	~Module();
 
 	inline const Value* GetExport(const std::string& name) {
-		auto pair = exports_.find(name);
+		auto pair = exports_.find(name.c_str());
 		if (pair == exports_.end()) {
-			throw std::logic_error("no such '" + name + "' export");
+			throw std::logic_error("no such '" + std::string(name) + "' export");
 		}
 		return pair->second;
 	}
