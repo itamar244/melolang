@@ -1,10 +1,8 @@
 #include "evaluator/utils.h"
 #include <exception>
 #include <map>
-#include <memory>
 #include <string>
 #include <atic/iterables.h>
-#include "melo/string.h"
 
 namespace melo::evaluator {
 
@@ -26,7 +24,7 @@ inline float LengthToFloat(const ast::NumericLiteral* length) {
 	return plus_half ? length_value * 1.5 : length_value;
 }
 
-inline uint8_t StringToNote(const String& str) {
+inline uint8_t StringToNote(const std::string& str) {
 	uint8_t pos = 0;
 	uint8_t base = kNotesToInt.find(str[pos++])->second;
 	if (str[pos] == 'b' || str[pos] == '#') {

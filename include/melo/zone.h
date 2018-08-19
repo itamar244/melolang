@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdlib>
-#include <atic/structs.h>
+#include <atic/stack.h>
 
 namespace melo {
 

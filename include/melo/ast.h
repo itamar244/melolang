@@ -4,10 +4,9 @@
 #include <memory>
 #include <string>
 #include <utility>
-#include <vector>
-#include "melo/list.h"
+#include <string>
+#include <atic/list.h>
 #include "melo/zone.h"
-#include "melo/string.h"
 
 namespace melo::ast {
 
@@ -73,31 +72,31 @@ struct Expression : public AstNode {
 };
 
 struct Identifier : public Expression {
-	const String name;
+	const std::string name;
 
-	Identifier(String&& name) : Expression(kIdentifier), name(std::move(name)) {}
+	Identifier(const std::string& name) : Expression(kIdentifier), name(name) {}
 };
 
 struct ListLiteral : public Expression {
-	const List<Expression*> elements;
+	const atic::List<Expression*> elements;
 
-	ListLiteral(List<Expression*> elements)
+	ListLiteral(const atic::List<Expression*>& elements)
 			: Expression(kListLiteral), elements(elements) {}
 };
 
 struct NumericLiteral : public Expression {
-	const String value;
+	const std::string value;
 
-	NumericLiteral(String&& value)
-			: Expression(kNumericLiteral), value(std::move(value)) {}
+	NumericLiteral(const std::string& value)
+			: Expression(kNumericLiteral), value(value) {}
 };
 
 struct PhraseLiteral : public Expression {
 	const NumericLiteral* length;
-	const List<Identifier*> notes;
+	const atic::List<Identifier*> notes;
 
 	PhraseLiteral(
-			const NumericLiteral* length, const List<Identifier*>& notes)
+			const NumericLiteral* length, const atic::List<Identifier*>& notes)
 			: Expression(kPhraseLiteral)
 			, length(length)
 			, notes(notes) {}
@@ -111,18 +110,18 @@ struct Spread : public Expression {
 
 struct FunctionCall : public Expression {
 	const Identifier* id;
-	const List<Expression*> args;
+	const atic::List<Expression*> args;
 
-	FunctionCall(const Identifier* id, const List<Expression*>& args)
+	FunctionCall(const Identifier* id, const atic::List<Expression*>& args)
 			: Expression(kFunctionCall)
 			, id(id)
 			, args(args) {}
 };
 
 struct Block : public Statement {
-	const List<const Statement*> statements;
+	const atic::List<Statement*> statements;
 
-	Block(const List<const Statement*>& statements)
+	Block(const atic::List<Statement*>& statements)
 			: Statement(kBlock), statements(statements) {}
 };
 
@@ -138,11 +137,11 @@ struct Export : public Statement {
 
 struct FunctionDeclaration : public Statement {
 	const Identifier* id;
-	const List<Identifier*> params;
+	const atic::List<Identifier*> params;
 	const Block* body;
 
 	FunctionDeclaration(
-			const Identifier* id, const List<Identifier*>& params, const Block* body)
+			const Identifier* id, const atic::List<Identifier*>& params, const Block* body)
 			: Statement(kFunctionDeclaration)
 			, id(id)
 			, params(params)
@@ -159,11 +158,6 @@ struct Return : public Statement {
 class NodeFactory {
 public:
 	NodeFactory(Zone* zone) : zone_(zone) {}
-
-	template<typename T>
-	inline List<T> CreateList() {
-		return {zone_};
-	}
 
 #define NODE_FACTORIES(NAME)                                                   \
  	template<typename... Args>                                                   \

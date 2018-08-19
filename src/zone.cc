@@ -5,13 +5,14 @@ namespace melo {
 
 Zone::~Zone() {
   while (!ptrs_.empty()) {
-    delete ptrs_.pop();
+    delete ptrs_.head();
+    ptrs_.pop();
   }
 }
 
 void* Zone::New(std::size_t size) {
   void* ptr = ::operator new(size);
-  ptrs_.push_front(reinterpret_cast<ZoneObject*>(ptr));
+  ptrs_.push(reinterpret_cast<ZoneObject*>(ptr));
   return ptr;
 }
 

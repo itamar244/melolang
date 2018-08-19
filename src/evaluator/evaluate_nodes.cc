@@ -7,7 +7,8 @@ namespace melo::evaluator {
 Value* EvaluateExpr(Scope& scope, const ast::Expression* expr) {
   switch (expr->type) {
     case ast::kNumericLiteral:
-      return new NumberValue(std::atof(expr->AsNumericLiteral()->value));
+      return new NumberValue(
+          std::atof(expr->AsNumericLiteral()->value.c_str()));
     case ast::kListLiteral:
       return new ListLiteralValue(expr->AsListLiteral());
     case ast::kFunctionCall:

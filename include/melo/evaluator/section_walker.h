@@ -2,7 +2,7 @@
 
 #include <atic/ptr.h>
 #include "melo/ast.h"
-#include "melo/list.h"
+#include <atic/list.h>
 #include "melo/evaluator/scope.h"
 #include "melo/evaluator/values.h"
 
@@ -20,7 +20,7 @@ public:
 	inline std::size_t pos() const {
 		return pos_;
 	}
-	
+
 	inline void Next() {
 		atic::MaybeDeletePtr(phrase_cache_);
 		++pos_;
@@ -36,7 +36,7 @@ public:
 private:
 	Scope& scope_;
 	const std::size_t section_size_;
-	List<ast::Expression*>::const_iterator section_iterator_;
+	atic::List<ast::Expression*>::const_iterator section_iterator_;
 	const PhraseValue* phrase_cache_ = nullptr;
 	std::size_t pos_ = 0;
 };

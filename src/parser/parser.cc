@@ -1,8 +1,8 @@
 #include "parser/parser.h"
 #include <exception>
 #include <utility>
+#include <atic/list.h>
 #include "melo/ast.h"
-#include "melo/list.h"
 
 namespace melo::parser {
 
@@ -14,7 +14,7 @@ Block* Parser::Parse() {
 }
 
 Block* Parser::ParseBlock(bool top_level) {
-	auto statements = CreateList<const Statement*>();
+	atic::List<Statement*> statements;
 
 	while (!Match(top_level ? tt::eof : tt::braceR)) {
 		auto statement = ParseStatement(top_level);
@@ -48,7 +48,7 @@ Expression* Parser::ParseExpression() {
 }
 
 ListLiteral* Parser::ParseListLiteral() {
-	auto elements = CreateList<Expression*>();
+	atic::List<Expression*> elements;
 
 	Next();
 	while (!Eat(tt::bracketR)) {
@@ -65,7 +65,7 @@ PhraseLiteral* Parser::ParsePhraseLiteral() {
 	ExpectAndNext(tt::parenL);
 	Expect(tt::num);
 	auto length = ParseNumber();
-	auto notes = CreateList<Identifier*>();
+	atic::List<Identifier*> notes;
 
 	while (!Eat(tt::parenR)) {
 		notes.push_back(ParseIdentifier());
@@ -80,7 +80,7 @@ Expression* Parser::ParseMaybeFunctionCall() {
 	if (!Eat(tt::parenL)) {
 		return id;
 	}
-	auto args = CreateList<Expression*>();
+	atic::List<Expression*> args;
 	// FIXME: when arguments are supported add params parsing
 	ExpectAndNext(tt::parenR);
 	return NewFunctionCall(id, args);
@@ -141,7 +141,7 @@ FunctionDeclaration* Parser::ParseFunctionDeclaration() {
 	auto id = ParseIdentifier();
 
 	ExpectAndNext(tt::parenL);
-	auto params = CreateList<Identifier*>();
+	atic::List<Identifier*> params;
 
 	while (!Eat(tt::parenR)) {
 		Expect(tt::name);
