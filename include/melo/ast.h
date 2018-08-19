@@ -43,7 +43,8 @@ enum NodeType : uint8_t {
 	MELO_AST_NODE_TYPES(FR_DECL)
 #undef FR_DECL
 
-struct AstNode {
+struct AstNode : public ZoneObject {
+	using ZoneObject::operator new;
 	const NodeType type;
 
 #define V(NAME)                                                                \
@@ -54,8 +55,6 @@ struct AstNode {
 
 	MELO_AST_NODE_TYPES(V)
 #undef V
-
-	void* operator new(std::size_t size, Zone* zone) { return zone->New(size); }
 
 protected:
 	AstNode(NodeType type) : type(type) {}
@@ -76,7 +75,7 @@ struct Expression : public AstNode {
 struct Identifier : public Expression {
 	const String name;
 
-	Identifier(const String& name) : Expression(kIdentifier), name(name) {}
+	Identifier(String&& name) : Expression(kIdentifier), name(std::move(name)) {}
 };
 
 struct ListLiteral : public Expression {
@@ -89,8 +88,8 @@ struct ListLiteral : public Expression {
 struct NumericLiteral : public Expression {
 	const String value;
 
-	NumericLiteral(const String& value)
-			: Expression(kNumericLiteral), value(value) {}
+	NumericLiteral(String&& value)
+			: Expression(kNumericLiteral), value(std::move(value)) {}
 };
 
 struct PhraseLiteral : public Expression {
@@ -160,10 +159,6 @@ struct Return : public Statement {
 class NodeFactory {
 public:
 	NodeFactory(Zone* zone) : zone_(zone) {}
-
-	inline String CreateString(const std::string& str) {
-		return String(zone_, str);
-	}
 
 	template<typename T>
 	inline List<T> CreateList() {

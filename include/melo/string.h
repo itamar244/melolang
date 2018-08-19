@@ -8,19 +8,24 @@
 
 namespace melo {
 
-class String {
+class String : public ZoneObject {
 public:
-  String(Zone*, const std::string&);
+  // String(const char*& buffer);
+  // String(const char*&& str);
+  String(const std::string&);
+  String(const String&);
+  String(String&&);
+  ~String() override;
 
-  const char* data() const { return data_; }
-  std::size_t size() const { return size_; }
+  inline const char* data() const { return data_; }
+  inline std::size_t size() const { return size_; }
 
   inline const char& at(std::size_t i) const {
     assert(i < size_);
     return data_[i];
   }
 
-  operator const char*() const {
+  inline operator const char*() const {
     return data_;
   }
 
@@ -40,8 +45,14 @@ public:
 	String operator+(const char* rhs) const;
 
 private:
-  const bool used_zone_;
   std::size_t size_;
   const char* data_;
+
+  // friend class String operator+(const char* lhs, const String& rhs);
+  //
+  // String() : data_(nullptr), size_(0) {}
+};
+
+// String operator+(const char* lhs, const String& rhs);
 
 } // namespace melo

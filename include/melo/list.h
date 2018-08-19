@@ -7,7 +7,7 @@
 namespace melo {
 
 template<typename T>
-class List {
+class List : public ZoneObject {
   struct Node : public ZoneObject {
     T value;
     Node* next;
