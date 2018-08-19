@@ -2,6 +2,7 @@
 #include <exception>
 #include <utility>
 #include "melo/ast.h"
+#include "melo/list.h"
 
 namespace melo::parser {
 
@@ -13,10 +14,11 @@ Block* Parser::Parse() {
 }
 
 Block* Parser::ParseBlock(bool top_level) {
-	std::vector<const Statement*> statements;
+	auto statements = CreateList<const Statement*>();
 
 	while (!Match(top_level ? tt::eof : tt::braceR)) {
-		auto& statement = statements.emplace_back(ParseStatement(top_level));
+		auto statement = ParseStatement(top_level);
+		statements.push_back(statement);
 		if (!statement->IsFunctionDeclaration()) {
 			ExpectAndNext(tt::semi);
 		}
@@ -46,7 +48,7 @@ Expression* Parser::ParseExpression() {
 }
 
 ListLiteral* Parser::ParseListLiteral() {
-	std::vector<Expression*> elements;
+	auto elements = CreateList<Expression*>();
 
 	Next();
 	while (!Eat(tt::bracketR)) {
@@ -63,7 +65,7 @@ PhraseLiteral* Parser::ParsePhraseLiteral() {
 	ExpectAndNext(tt::parenL);
 	Expect(tt::num);
 	auto length = ParseNumber();
-	std::vector<Identifier*> notes;
+	auto notes = CreateList<Identifier*>();
 
 	while (!Eat(tt::parenR)) {
 		notes.push_back(ParseIdentifier());
@@ -78,7 +80,7 @@ Expression* Parser::ParseMaybeFunctionCall() {
 	if (!Eat(tt::parenL)) {
 		return id;
 	}
-	std::vector<Expression*> args;
+	auto args = CreateList<Expression*>();
 	// FIXME: when arguments are supported add params parsing
 	ExpectAndNext(tt::parenR);
 	return NewFunctionCall(id, args);
@@ -139,7 +141,7 @@ FunctionDeclaration* Parser::ParseFunctionDeclaration() {
 	auto id = ParseIdentifier();
 
 	ExpectAndNext(tt::parenL);
-	std::vector<Identifier*> params;
+	auto params = CreateList<Identifier*>();
 
 	while (!Eat(tt::parenR)) {
 		Expect(tt::name);

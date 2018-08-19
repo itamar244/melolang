@@ -10,16 +10,10 @@ SectionWalker::~SectionWalker() {
 	atic::MaybeDeletePtr(phrase_cache_);
 }
 
-bool SectionWalker::HasNextPhrase() const {
-	auto& phrases = section_->list->elements;
-
-	return pos_ < phrases.size();
-}
-
 const PhraseValue* SectionWalker::GetCurPhrase() {
 	if (phrase_cache_ == nullptr) {
 		phrase_cache_ = EvaluateExpr(
-				scope_, section_->list->elements.at(pos_))->ExpectPhraseValue();
+				scope_, *section_iterator_)->ExpectPhraseValue();
 	}
 
 	return phrase_cache_;

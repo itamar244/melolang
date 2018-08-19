@@ -8,7 +8,7 @@ namespace melo::evaluator {
 
 Module::Module(ast::Block* program, Zone* zone)
 		: program_(program), zone_(zone) {
-	for (auto statement : program_->statements) {
+	for (const auto& statement : program_->statements) {
 		if (const auto& export_decl = statement->AsExport()) {
 			const auto& name = export_decl->id->name;
 			auto value = EvaluateExpr(top_scope_, export_decl->value);

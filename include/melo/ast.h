@@ -5,6 +5,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "melo/list.h"
 #include "melo/zone.h"
 #include "melo/string.h"
 
@@ -79,9 +80,9 @@ struct Identifier : public Expression {
 };
 
 struct ListLiteral : public Expression {
-	const std::vector<Expression*> elements;
+	const List<Expression*> elements;
 
-	ListLiteral(std::vector<Expression*> elements)
+	ListLiteral(List<Expression*> elements)
 			: Expression(kListLiteral), elements(elements) {}
 };
 
@@ -94,10 +95,10 @@ struct NumericLiteral : public Expression {
 
 struct PhraseLiteral : public Expression {
 	const NumericLiteral* length;
-	const std::vector<Identifier*> notes;
+	const List<Identifier*> notes;
 
 	PhraseLiteral(
-			const NumericLiteral* length, std::vector<Identifier*>& notes)
+			const NumericLiteral* length, const List<Identifier*>& notes)
 			: Expression(kPhraseLiteral)
 			, length(length)
 			, notes(notes) {}
@@ -111,19 +112,19 @@ struct Spread : public Expression {
 
 struct FunctionCall : public Expression {
 	const Identifier* id;
-	const std::vector<Expression*> args;
+	const List<Expression*> args;
 
-	FunctionCall(const Identifier* id, std::vector<Expression*>& args)
+	FunctionCall(const Identifier* id, const List<Expression*>& args)
 			: Expression(kFunctionCall)
 			, id(id)
-			, args(std::move(args)) {}
+			, args(args) {}
 };
 
 struct Block : public Statement {
-	const std::vector<const Statement*> statements;
+	const List<const Statement*> statements;
 
-	Block(std::vector<const Statement*>& statements)
-			: Statement(kBlock), statements(std::move(statements)) {}
+	Block(const List<const Statement*>& statements)
+			: Statement(kBlock), statements(statements) {}
 };
 
 struct Export : public Statement {
@@ -138,14 +139,14 @@ struct Export : public Statement {
 
 struct FunctionDeclaration : public Statement {
 	const Identifier* id;
-	const std::vector<Identifier*> params;
+	const List<Identifier*> params;
 	const Block* body;
 
 	FunctionDeclaration(
-			const Identifier* id, std::vector<Identifier*>& params, const Block* body)
+			const Identifier* id, const List<Identifier*>& params, const Block* body)
 			: Statement(kFunctionDeclaration)
 			, id(id)
-			, params(std::move(params))
+			, params(params)
 			, body(body) {}
 };
 
@@ -164,9 +165,14 @@ public:
 		return String(zone_, str);
 	}
 
+	template<typename T>
+	inline List<T> CreateList() {
+		return {zone_};
+	}
+
 #define NODE_FACTORIES(NAME)                                                   \
  	template<typename... Args>                                                   \
-	NAME* New##NAME(Args... args) {                                              \
+	NAME* New##NAME(const Args&... args) {                                       \
 		return new (zone_) NAME(args...);                                          \
 	}
 
@@ -176,5 +182,7 @@ public:
 private:
 	Zone* zone_;
 };
+
+std::string NodeTypeToString(NodeType);
 
 } // namespace melo::ast
