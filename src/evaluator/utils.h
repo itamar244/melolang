@@ -3,10 +3,10 @@
 #include <map>
 #include <string>
 #include "melo/ast.h"
-#include "melo/evaluator/values.h"
+#include "melo/phrase.h"
 
 namespace melo::evaluator {
 
-PhraseValue PhraseLiteralToValue(const ast::PhraseLiteral* phrase);
+Phrase PhraseLiteralToValue(const ast::PhraseLiteral* phrase);
 
 }  // namespace melo::evaluator

@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include "melo/ast.h"
+#include "melo/zone.h"
 
 namespace melo::evaluator {
 
@@ -28,7 +29,8 @@ enum ValueType : uint8_t {
 	MELO_EVALUATOR_VALUE_TYPES(FR_DECL)
 #undef FR_DECL
 
-struct Value {
+struct Value : public ZoneObject {
+	using ZoneObject::operator new;
 	const ValueType type;
 
 #define V(NAME)                                                                \
@@ -71,14 +73,16 @@ struct ListLiteralValue : public Value {
 
 	ListLiteralValue(const ast::ListLiteral* list)
 			: Value(kListLiteralValue), list(list) {}
+
+	inline std::size_t size() const { return list->elements.size(); }
+	inline auto begin() const { return list->elements.begin(); }
 };
 
 struct PhraseValue : public Value {
-	const std::list<uint8_t> notes;
-	const float length;
+	const ast::PhraseLiteral* phrase;
 
-	PhraseValue(const std::list<uint8_t>& notes, float length)
-			: Value(kPhraseValue), notes(notes), length(length) {}
+	PhraseValue(const ast::PhraseLiteral* phrase)
+			: Value(kPhraseValue), phrase(phrase) {}
 };
 
 }  // namespace melo::evaluator

@@ -1,5 +1,4 @@
 #include "melo/evaluator/section_walker.h"
-#include <iostream>
 #include <atic/ptr.h>
 #include "melo/evaluator/evaluate_nodes.h"
 #include "evaluator/utils.h"
@@ -36,7 +35,7 @@ void SectionWalker::Next() {
 	++pos_;
 }
 
-const PhraseValue* SectionWalker::GetCurPhrase() {
+Phrase SectionWalker::GetCurPhrase() {
 	if (nested_walker_) {
 		return nested_walker_->GetCurPhrase();
 	}
@@ -49,8 +48,8 @@ const PhraseValue* SectionWalker::GetCurPhrase() {
 		return nested_walker_->GetCurPhrase();
 	}
 
-	return EvaluateExpr(
-			scope_, *section_iterator_)->ExpectPhraseValue();
+	return PhraseLiteralToValue(
+			EvaluateExpr(scope_, *section_iterator_)->ExpectPhraseValue()->phrase);
 }
 
 } // namespace melo::evaluator

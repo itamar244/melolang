@@ -2,12 +2,6 @@
 
 namespace melo::evaluator {
 
-Scope::~Scope() {
-  for (const auto& pair : data_) {
-    delete pair.second;
-  }
-}
-
 const Value* Scope::Get(const std::string& name) const {
   const Scope* cur = this;
   const Value* value = nullptr;
@@ -27,7 +21,6 @@ const Value* Scope::Get(const std::string& name) const {
 void Scope::Set(const std::string& name, const Value* value) {
   auto it = data_.find(name);
   if (it != data_.end()) {
-    delete it->second;
     it->second = value;
   } else {
     data_.insert({ name, value });

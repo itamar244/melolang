@@ -38,7 +38,7 @@ inline uint8_t StringToNote(const std::string& str) {
 
 } // namespace
 
-PhraseValue PhraseLiteralToValue(const ast::PhraseLiteral* phrase) {
+Phrase PhraseLiteralToValue(const ast::PhraseLiteral* phrase) {
 	return {
 		atic::MapIterable<decltype(phrase->notes), std::list<uint8_t> >(
 			phrase->notes, [](const ast::Identifier* id) {

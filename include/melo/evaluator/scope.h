@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include "melo/evaluator/values.h"
+#include "melo/zone.h"
 
 namespace melo::evaluator {
 
@@ -12,12 +13,13 @@ public:
 
   Scope(const Scope* next = nullptr) : next_(next) {}
 
-  ~Scope();
+  inline Zone* zone() { return &zone_; }
 
   const Value* Get(const std::string& name) const;
   void Set(const std::string& name, const Value* value);
 
 private:
+  Zone zone_;
   Data data_;
   const Scope* next_;
 };

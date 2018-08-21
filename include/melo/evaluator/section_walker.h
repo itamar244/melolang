@@ -1,10 +1,11 @@
 #pragma once
 
 #include <atic/ptr.h>
-#include "melo/ast.h"
 #include <atic/list.h>
+#include "melo/ast.h"
 #include "melo/evaluator/scope.h"
 #include "melo/evaluator/values.h"
+#include "melo/phrase.h"
 
 namespace melo::evaluator {
 
@@ -19,7 +20,7 @@ public:
 
 	bool HasNextPhrase() const;
 	void Next();
-	const PhraseValue* GetCurPhrase();
+	Phrase GetCurPhrase();
 
 private:
 	Scope& scope_;

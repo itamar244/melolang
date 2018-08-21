@@ -12,6 +12,10 @@ public:
   ~Zone();
   void* New(std::size_t size);
 
+  inline void Add(ZoneObject* object) {
+    ptrs_.push(object);
+  }
+
 private:
   atic::Stack<ZoneObject*> ptrs_;
 };
