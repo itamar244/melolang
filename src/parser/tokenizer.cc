@@ -12,7 +12,7 @@ void Tokenizer::Next() {
 	state_->start = state_->pos;
 	if (state_->ended()) {
 		FinishToken(tt::eof);
-	} else if (std::isdigit(ch) || ch == '.') {
+	} else if (std::isdigit(ch)) {
 		ReadNumber();
 	} else if (isalpha(ch) || ch == '_') {
 		ReadIdentifier();
@@ -77,7 +77,9 @@ void Tokenizer::ReadIdentifier() {
 
 void Tokenizer::ReadDot() {
 	if (state_->CurChar() == '.') {
+		state_->pos++;
 		if (state_->CurChar() == '.') {
+			state_->pos++;
 			FinishToken(tt::spread);
 		} else {
 			throw std::logic_error("'..', unexpected dot");

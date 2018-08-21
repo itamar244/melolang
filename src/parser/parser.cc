@@ -40,6 +40,8 @@ Expression* Parser::ParseExpression() {
 			return ParseNumber();
 		case tt::name:
 			return ParseMaybeFunctionCall();
+		case tt::spread:
+			return ParseSpread();
 		default:
 			throw std::logic_error(
 					"unsupported token for expression: " +
@@ -98,6 +100,11 @@ NumericLiteral* Parser::ParseNumber() {
 	return num;
 }
 
+Spread* Parser::ParseSpread() {
+	Next();
+	return NewSpread(ParseExpression());
+}
+
 // ------------------------------- statements ----------------------------------
 Statement* Parser::ParseStatement(bool top_level) {
 	switch (state_->type) {
@@ -147,7 +154,7 @@ FunctionDeclaration* Parser::ParseFunctionDeclaration() {
 		Expect(tt::name);
 		params.push_back(ParseIdentifier());
 		if (!Eat(tt::comma) && !Match(tt::parenR)) {
-			throw std::logic_error("unfinished section");
+			throw std::logic_error("unfinished arguments");
 		}
 	}
 

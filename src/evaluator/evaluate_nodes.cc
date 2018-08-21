@@ -16,8 +16,7 @@ Value* EvaluateExpr(Scope& scope, const ast::Expression* expr) {
           scope,
           scope.Get(expr->AsFunctionCall()->id->name)->ExpectFunctionValue());
     case ast::kPhraseLiteral:
-      return new PhraseValue(
-          std::move(PhraseLiteralToValue(expr->AsPhraseLiteral())));
+      return PhraseLiteralToValue(expr->AsPhraseLiteral());
     default:
       throw std::logic_error(
           "expression type isn't supported as value" +

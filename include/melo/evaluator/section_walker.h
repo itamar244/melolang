@@ -10,34 +10,22 @@ namespace melo::evaluator {
 
 class SectionWalker {
 public:
-	SectionWalker(Scope& scope, const ListLiteralValue* section)
-			: scope_(scope)
-			, section_size_(section->list->elements.size())
-			, section_iterator_(section->list->elements.begin()) {}
-
+	SectionWalker(Scope& scope, const ListLiteralValue* section);
 	~SectionWalker();
 
 	inline std::size_t pos() const {
 		return pos_;
 	}
 
-	inline void Next() {
-		atic::MaybeDeletePtr(phrase_cache_);
-		++pos_;
-		++section_iterator_;
-	}
-
-	inline bool HasNextPhrase() const {
-		return pos_ < section_size_;
-	}
-
+	bool HasNextPhrase() const;
+	void Next();
 	const PhraseValue* GetCurPhrase();
 
 private:
 	Scope& scope_;
 	const std::size_t section_size_;
 	atic::List<ast::Expression*>::const_iterator section_iterator_;
-	const PhraseValue* phrase_cache_ = nullptr;
+	SectionWalker* nested_walker_ = nullptr;
 	std::size_t pos_ = 0;
 };
 
