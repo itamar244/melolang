@@ -76,6 +76,7 @@ struct ListLiteralValue : public Value {
 
 	inline std::size_t size() const { return list->elements.size(); }
 	inline auto begin() const { return list->elements.begin(); }
+	inline auto end() const { return list->elements.end(); }
 };
 
 struct PhraseValue : public Value {

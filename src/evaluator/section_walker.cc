@@ -5,10 +5,16 @@
 
 namespace melo::evaluator {
 
-SectionWalker::SectionWalker(Scope& scope, const ListLiteralValue* section)
+SectionWalker::SectionWalker(
+		Scope& scope, const ListLiteralValue* section, bool to_flat_lists)
 		: scope_(scope)
-		, section_size_(section->list->elements.size())
-		, section_iterator_(section->list->elements.begin()) {}
+		, section_(section)
+		, section_size_(section->size())
+		, section_iterator_(section->begin())
+		, to_flat_lists_(to_flat_lists) {}
+
+SectionWalker::SectionWalker(Scope& scope, const ListLiteralValue* section)
+		: SectionWalker(scope, section, true) {}
 
 SectionWalker::~SectionWalker() {
 	atic::MaybeDeletePtr(nested_walker_);
@@ -35,6 +41,7 @@ void SectionWalker::Next() {
 	++pos_;
 }
 
+// FIXME: will have issues with empty nested_walker_
 Phrase SectionWalker::GetCurPhrase() {
 	if (nested_walker_) {
 		return nested_walker_->GetCurPhrase();
@@ -44,12 +51,16 @@ Phrase SectionWalker::GetCurPhrase() {
 		nested_walker_ = new SectionWalker(
 				scope_,
 				EvaluateExpr(scope_, spread->value)->ExpectListLiteralValue());
-		// FIXME: will have issues with empty nested_walker_
 		return nested_walker_->GetCurPhrase();
 	}
 
-	return PhraseLiteralToValue(
-			EvaluateExpr(scope_, *section_iterator_)->ExpectPhraseValue()->phrase);
+	auto val = EvaluateExpr(scope_, *section_iterator_);
+	if (to_flat_lists_ && val->IsListLiteralValue()) {
+		nested_walker_ = new SectionWalker(scope_, val->AsListLiteralValue());
+		return nested_walker_->GetCurPhrase();
+	}
+
+	return PhraseLiteralToValue(val->ExpectPhraseValue()->phrase);
 }
 
 } // namespace melo::evaluator

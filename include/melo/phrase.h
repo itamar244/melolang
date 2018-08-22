@@ -22,8 +22,4 @@ struct Phrase {
 	}
 };
 
-inline uint16_t PhraseLengthInMillis(const Phrase& phrase, float speed) {
-	return 60 * phrase.length / speed;
-}
-
 }  // namespace melo
