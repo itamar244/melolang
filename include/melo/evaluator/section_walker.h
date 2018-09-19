@@ -41,10 +41,6 @@ private:
 	atic::List<ast::Expression*>::const_iterator section_iterator_;
 	SectionWalker* nested_walker_ = nullptr;
 	std::size_t pos_ = 0;
-	bool to_flat_lists_;
-
-	SectionWalker(
-			Scope& scope, const ListLiteralValue* section, bool to_flat_lists);
 };
 
 }  // namespace melo::evaluator
