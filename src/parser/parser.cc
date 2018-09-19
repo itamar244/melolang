@@ -108,21 +108,18 @@ Spread* Parser::ParseSpread() {
 // ------------------------------- statements ----------------------------------
 Statement* Parser::ParseStatement(bool top_level) {
 	switch (state_->type) {
-		// case tt::_var:
-		// 	return ParseVarDeclaration();
-		// 	break;
 		case tt::_export:
 			if (!top_level) {
 				throw std::logic_error("export must be at top level");
 			}
 			return ParseExport();
-			break;
+		case tt::_let:
+			return ParseVariableDeclaration();
 		case tt::_func:
 			if (!top_level) {
 				throw std::logic_error("function must be at top level");
 			}
 			return ParseFunctionDeclaration();
-			break;
 		case tt::_return:
 			if (top_level) {
 				throw std::logic_error("return must be inside a function");
@@ -140,6 +137,12 @@ Export* Parser::ParseExport() {
 	Expect(tt::name);
 
 	return NewExport(ParseIdentifier(), ParseExpression());
+}
+
+ast::VariableDeclaration* Parser::ParseVariableDeclaration() {
+	Next();
+	Expect(tt::name);
+	return NewVariableDeclaration(ParseIdentifier(), ParseExpression());
 }
 
 FunctionDeclaration* Parser::ParseFunctionDeclaration() {

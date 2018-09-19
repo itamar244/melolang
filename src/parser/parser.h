@@ -31,6 +31,7 @@ private:
 	// statements
 	ast::Statement* ParseStatement(bool top_level);
 	ast::Export* ParseExport();
+	ast::VariableDeclaration* ParseVariableDeclaration();
 	ast::FunctionDeclaration* ParseFunctionDeclaration();
 	ast::Return* ParseReturn();
 };

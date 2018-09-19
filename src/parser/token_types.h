@@ -9,7 +9,7 @@ namespace melo::parser {
 	V(func)                                                                      \
 	V(return)                                                                    \
 	V(export)                                                                    \
-	V(var)
+	V(let)
 
 #define MELO_TOKEN_TYPES(V)                                                    \
 	V(num)                                                                       \

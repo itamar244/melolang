@@ -31,6 +31,13 @@ void Module::AddNodeToScope(const ast::Statement* statement) {
 			top_scope_.Set(func->id->name, new FunctionValue(func->body));
 			break;
 		}
+		case ast::kVariableDeclaration: {
+			auto var = statement->AsVariableDeclaration();
+			top_scope_.Set(var->id->name, EvaluateExpr(top_scope_, var->val));
+			break;
+		}
+		default:
+			break;
 	}
 }
 

@@ -12,6 +12,7 @@ namespace melo::ast {
 
 #define MELO_STATEMENT_NODE_TYPES(V)                                           \
 	V(FunctionDeclaration)                                                       \
+	V(VariableDeclaration)                                                       \
 	V(Export)                                                                    \
 	V(Return)
 
@@ -115,6 +116,7 @@ struct FunctionCall : public Expression {
 			, args(args) {}
 };
 
+// statements
 struct Block : public Statement {
 	const atic::List<Statement*> statements;
 
@@ -151,6 +153,13 @@ struct Return : public Statement {
 	Return(Expression* expr) : Statement(kReturn), expr(expr) {}
 };
 
+struct VariableDeclaration : public Statement {
+	const Identifier* id;
+	const Expression* val;
+
+	VariableDeclaration(const Identifier* id, const Expression* val)
+			: Statement(kVariableDeclaration), id(id), val(val) {}
+};
 
 class NodeFactory {
 public:
