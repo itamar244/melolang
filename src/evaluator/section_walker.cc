@@ -1,6 +1,6 @@
 #include "melo/evaluator/section_walker.h"
 #include <atic/ptr.h>
-#include "melo/evaluator/evaluate_nodes.h"
+#include "evaluator/evaluate_nodes.h"
 #include "evaluator/utils.h"
 
 namespace melo::evaluator {

@@ -6,7 +6,7 @@
 
 namespace melo::evaluator {
 
-const Value* EvaluateExpr(Scope& scope, const ast::Expression* expr);
-const Value* EvaluateFunction(Scope& scope, const FunctionValue* func);
+Scope::Value EvaluateExpr(Scope& scope, const ast::Expression* expr);
+Scope::Value EvaluateFunction(Scope& scope, const FunctionValue* func);
 
 } // namespace melo::evaluator
