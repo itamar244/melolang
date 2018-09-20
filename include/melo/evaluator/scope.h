@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <string>
 #include "melo/evaluator/values.h"
 #include "melo/zone.h"
@@ -9,17 +10,24 @@ namespace melo::evaluator {
 
 class Scope {
 public:
-  using Data = std::map<std::string, const Value*>;
+  using Value = std::shared_ptr<const melo::evaluator::Value>;
+  using Data = std::map<std::string, Value>;
 
   Scope(const Scope* next = nullptr) : next_(next) {}
 
-  inline Zone* zone() { return &zone_; }
+  Value Get(const std::string& name);
+  void Set(const std::string& name, Value value);
 
-  const Value* Get(const std::string& name) const;
-  void Set(const std::string& name, const Value* value);
+#define VALUES_CREATOR(NAME)                                                   \
+  template<typename... Args>                                                   \
+  static inline std::shared_ptr<NAME> New##NAME(const Args&... args) {         \
+    return std::make_shared<NAME>(args...);                                    \
+  }
+
+  MELO_EVALUATOR_VALUE_TYPES(VALUES_CREATOR)
+#undef VALUES_CREATOR
 
 private:
-  Zone zone_;
   Data data_;
   const Scope* next_;
 };

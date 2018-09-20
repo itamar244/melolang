@@ -6,7 +6,6 @@
 #include <memory>
 #include <string>
 #include "melo/ast.h"
-#include "melo/zone.h"
 
 namespace melo::evaluator {
 
@@ -29,8 +28,7 @@ enum ValueType : uint8_t {
 	MELO_EVALUATOR_VALUE_TYPES(FR_DECL)
 #undef FR_DECL
 
-struct Value : public ZoneObject {
-	using ZoneObject::operator new;
+struct Value {
 	const ValueType type;
 
 #define V(NAME)                                                                \

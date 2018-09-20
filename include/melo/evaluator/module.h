@@ -16,7 +16,7 @@ public:
 	Module(ast::Block* program, Zone* zone);
 	~Module();
 
-	inline const Value* GetExport(const std::string& name) {
+	inline Scope::Value GetExport(const std::string& name) {
 		auto pair = exports_.find(name);
 		if (pair == exports_.end()) {
 			throw std::logic_error("no such '" + std::string(name) + "' export");

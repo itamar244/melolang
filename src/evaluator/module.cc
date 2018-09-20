@@ -28,7 +28,7 @@ void Module::AddNodeToScope(const ast::Statement* statement) {
 	switch (statement->type) {
 		case ast::kFunctionDeclaration: {
 			auto func = statement->AsFunctionDeclaration();
-			top_scope_.Set(func->id->name, new FunctionValue(func->body));
+			top_scope_.Set(func->id->name, Scope::NewFunctionValue(func->body));
 			break;
 		}
 		case ast::kVariableDeclaration: {

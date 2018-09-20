@@ -4,13 +4,13 @@
 
 namespace melo::evaluator {
 
-const Value* EvaluateExpr(Scope& scope, const ast::Expression* expr) {
+Scope::Value EvaluateExpr(Scope& scope, const ast::Expression* expr) {
   switch (expr->type) {
     case ast::kNumericLiteral:
-      return new (scope.zone()) NumberValue(
+      return Scope::NewNumberValue(
           std::atof(expr->AsNumericLiteral()->value.c_str()));
     case ast::kListLiteral:
-      return new (scope.zone()) ListLiteralValue(expr->AsListLiteral());
+      return Scope::NewListLiteralValue(expr->AsListLiteral());
     case ast::kIdentifier:
       return scope.Get(expr->AsIdentifier()->name);
     case ast::kFunctionCall:
@@ -18,7 +18,7 @@ const Value* EvaluateExpr(Scope& scope, const ast::Expression* expr) {
           scope,
           scope.Get(expr->AsFunctionCall()->id->name)->ExpectFunctionValue());
     case ast::kPhraseLiteral:
-      return new (scope.zone()) PhraseValue(expr->AsPhraseLiteral());
+      return Scope::NewPhraseValue(expr->AsPhraseLiteral());
     default:
       throw std::logic_error(
           "expression type isn't supported as value" +
@@ -26,7 +26,7 @@ const Value* EvaluateExpr(Scope& scope, const ast::Expression* expr) {
   }
 }
 
-const Value* EvaluateFunction(Scope& scope, const FunctionValue* func) {
+Scope::Value EvaluateFunction(Scope& scope, const FunctionValue* func) {
   Scope local_scope(&scope);
 
   for (const auto& statement : func->body->statements) {
@@ -38,7 +38,7 @@ const Value* EvaluateFunction(Scope& scope, const FunctionValue* func) {
     }
   }
 
-  return new NullValue();
+  return Scope::NewNullValue();
 }
 
 } // namespace melo::evaluator

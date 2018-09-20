@@ -2,9 +2,9 @@
 
 namespace melo::evaluator {
 
-const Value* Scope::Get(const std::string& name) const {
+Scope::Value Scope::Get(const std::string& name) {
   const Scope* cur = this;
-  const Value* value = nullptr;
+  Value value = nullptr;
 
   do {
     auto entry = data_.find(name);
@@ -18,7 +18,7 @@ const Value* Scope::Get(const std::string& name) const {
   return value;
 }
 
-void Scope::Set(const std::string& name, const Value* value) {
+void Scope::Set(const std::string& name, Scope::Value value) {
   auto it = data_.find(name);
   if (it != data_.end()) {
     it->second = value;
