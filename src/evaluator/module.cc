@@ -21,7 +21,7 @@ Module::Module(ast::Block* program, Zone* zone)
 }
 
 Module::~Module() {
-	delete zone_;
+	if (zone_) delete zone_;
 }
 
 void Module::AddNodeToScope(const ast::Statement* statement) {

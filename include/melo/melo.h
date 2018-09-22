@@ -19,8 +19,9 @@ inline Module CreateModule(std::istream& stream) {
 	auto zone = new Zone();
 	return {Parse(stream, zone), zone};
 }
+
 inline Module CreateModule(ast::Block* program) {
-	return {program, new Zone()};
+	return {program, nullptr};
 }
 
 } // namespace melo
