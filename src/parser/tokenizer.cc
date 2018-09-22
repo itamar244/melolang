@@ -41,10 +41,12 @@ void Tokenizer::GetTokenFromChar(char ch) {
 			return FinishToken(tt::bracketL);
 		case ']':
 			return FinishToken(tt::bracketR);
-		case ';':
-			return FinishToken(tt::semi);
 		case '.':
 			return ReadDot();
+		case '<':
+			return FinishToken(tt::lt);
+		case '>':
+			return FinishToken(tt::gt);
 		default:
 			FinishTokenWithValue(tt::error);
 	}

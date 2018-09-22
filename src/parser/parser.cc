@@ -19,9 +19,9 @@ Block* Parser::ParseBlock(bool top_level) {
 	while (!Match(top_level ? tt::eof : tt::braceR)) {
 		auto statement = ParseStatement(top_level);
 		statements.push_back(statement);
-		if (!statement->IsFunctionDeclaration()) {
-			ExpectAndNext(tt::semi);
-		}
+		// if (!statement->IsFunctionDeclaration()) {
+		// 	ExpectAndNext(tt::semi);
+		// }
 	}
 	// skipping the closing '}'
 	if (!top_level) Next();
@@ -34,7 +34,7 @@ Expression* Parser::ParseExpression() {
 	switch (state_->type) {
 		case tt::bracketL:
 			return ParseListLiteral();
-		case tt::parenL:
+		case tt::lt:
 			return ParsePhraseLiteral();
 		case tt::num:
 			return ParseNumber();
@@ -55,8 +55,8 @@ ListLiteral* Parser::ParseListLiteral() {
 	Next();
 	while (!Eat(tt::bracketR)) {
 		elements.push_back(ParseExpression());
-		if (!Eat(tt::comma) && !Match(tt::bracketR)) {
-			throw std::logic_error("unfinished section");
+		if (Match(tt::eof)) {
+			throw std::logic_error("unfinished list");
 		}
 	}
 
@@ -64,12 +64,12 @@ ListLiteral* Parser::ParseListLiteral() {
 }
 
 PhraseLiteral* Parser::ParsePhraseLiteral() {
-	ExpectAndNext(tt::parenL);
+	Next();
 	Expect(tt::num);
 	auto length = ParseNumber();
 	atic::List<Identifier*> notes;
 
-	while (!Eat(tt::parenR)) {
+	while (!Eat(tt::gt)) {
 		notes.push_back(ParseIdentifier());
 	}
 
@@ -127,7 +127,7 @@ Statement* Parser::ParseStatement(bool top_level) {
 			return ParseReturn();
 		default:
 			throw std::logic_error(
-					"unsupported token for statement: " +
+					"unexpected token for statemenet: " +
 					TokenTypeToString(state_->type));
 	}
 }

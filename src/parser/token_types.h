@@ -15,11 +15,12 @@ namespace melo::parser {
 	V(num)                                                                       \
 	V(name)                                                                      \
 	                                                                             \
-	V(semi)                                                                      \
 	V(comma)                                                                     \
 	V(dot)                                                                       \
 	V(spread)                                                                    \
 	V(eq)                                                                        \
+	V(lt)                                                                        \
+	V(gt)                                                                        \
 	V(bracketL)                                                                  \
 	V(bracketR)                                                                  \
 	V(braceL)                                                                    \
