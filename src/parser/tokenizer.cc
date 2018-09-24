@@ -65,7 +65,7 @@ void Tokenizer::ReadIdentifier() {
 	do {
 		state_->pos += 1;
 		ch = state_->CurChar();
-	} while (std::isalnum(ch) || ch ==  '_' || ch == '#');
+	} while (std::isalnum(ch) || ch == '_' || ch == '#');
 
 	const std::string word = state_->CurValue();
 	const auto keyword = keywords.find(word);

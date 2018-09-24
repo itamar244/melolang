@@ -10,7 +10,7 @@
 namespace melo::parser {
 
 struct State {
-  using Ptr = std::shared_ptr<State>;
+	using Ptr = std::shared_ptr<State>;
 
 	static Ptr Create(std::istream& input) {
 		return std::make_shared<State>(input);
